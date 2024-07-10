@@ -8,6 +8,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import { useNavigate } from "react-router-dom";
 import notificationSound from "../assets/notification.mp3";
 import { AuthContext } from "../context/protectedRoutes";
+import moment from "moment";
 
 export const FoodAppProvider = ({ children }) => {
     const navigate = useNavigate();
@@ -20,10 +21,18 @@ export const FoodAppProvider = ({ children }) => {
     const [openNotifications, setOpenNotifications] = useState(false);
     const [orders, setOrders] = useState([]);
     const [newRestaurants, setNewRestaurants] = useState([]);
+    const [newDeliveryPeople, setNewDeliveryPeople] = useState([]);
     const [animateBell, setAnimateBell] = useState(false);
     const [mainBlurred, setMainBlurred] = useState(false);
     const [orderList, setOrderList] = useState([])
     const { adminType } = useContext(AuthContext)
+
+    const getMinAgo = (orderTime) => {
+        const currentTime = moment();
+        const diff = currentTime.diff(orderTime)
+        const timeDur = moment.duration(diff)
+        return timeDur.minutes() == 0 ? 'just now' : `${timeDur.minutes()} mins ago`
+    }
 
     useEffect(() => {
         const ws = new WebSocket('ws://localhost:8080');
@@ -33,10 +42,9 @@ export const FoodAppProvider = ({ children }) => {
         ws.onmessage = (e) => {
             const message = JSON.parse(e.data);
             console.log('message:', message);
-            if (message.type === 'newOrder') {
-                if (adminType === 'shop-admin') {
-                    playNotificationSound();
-                }
+            console.log('adminType:', adminType);
+            if (message.type === 'newOrder' && adminType === 'shop-admin') {
+                playNotificationSound();
                 setSuccessToast('An Order Received')
                 setAnimateBell(true);
                 setOrders((prev) => [...prev, message.data])
@@ -46,13 +54,17 @@ export const FoodAppProvider = ({ children }) => {
                         order._id === message.data._id ? message.data : order
                     )
                 )
-            } else if (message.type === 'newRestaurant') {
-                if (adminType === 'admin') {
-                    playNotificationSound();
-                }
+            } else if (message.type === 'newRestaurant' && adminType === 'admin') {
+                playNotificationSound();
                 console.log('new restaurant');
                 setAnimateBell(true);
+                message.data.registeredAt = getMinAgo(message.data.registeredAt)
                 setNewRestaurants((prev) => [...prev, message.data])
+            } else if (message.type === 'newDeliveryPeople' && adminType === 'admin') {
+                playNotificationSound();
+                console.log('new delivery people');
+                setAnimateBell(true);
+                setNewDeliveryPeople((prev) => [...prev, message.application])
             }
         }
 
@@ -65,7 +77,7 @@ export const FoodAppProvider = ({ children }) => {
         };
 
         return () => ws.close()
-    }, [])
+    }, [adminType])
 
     useEffect(() => {
         if (errorToast !== '') {
@@ -405,8 +417,10 @@ export const FoodAppProvider = ({ children }) => {
                 setMainBlurred,
                 mainBlurred,
                 orderList,
-                setOrderList
-
+                setOrderList,
+                newDeliveryPeople,
+                setNewDeliveryPeople,
+                getMinAgo
             }}
         >
             {children}

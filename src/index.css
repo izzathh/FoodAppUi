@@ -1599,7 +1599,7 @@ button.save-edited-changes {
   top: 3.7em;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-start;
   background-color: #fff;
   border-radius: 10px;
   font-size: larger;
@@ -1608,6 +1608,7 @@ button.save-edited-changes {
   height: 28em;
   box-shadow: 0px 0px 21px #0000001f;
   transition: all 0.5s ease;
+  min-width: 22em;
 }
 
 .all-req-notification {
@@ -1708,7 +1709,7 @@ span.no-notify {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-start;
   gap: 1em;
   width: 100%;
   overflow: auto;
@@ -1717,11 +1718,11 @@ span.no-notify {
 .notification-contents>div {
   background-color: #ede7f6;
   cursor: pointer;
-  width: 100%;
+  width: 90%;
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 10px 0;
+  padding: 10px;
   border-radius: 10px;
   gap: 1em;
 }
@@ -2031,6 +2032,7 @@ label.error-label {
   width: 30px !important;
   border-top: 4px solid #a835b9;
   height: 10px;
+  z-index: 3;
   border-radius: 50% !important;
   cursor: auto !important;
   position: absolute;
@@ -2156,4 +2158,17 @@ label.error-label {
 
 .orderid-title-close h2 {
   margin: 15px 0 0;
+}
+
+.notifications-container-blur::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #00000057;
+  border-radius: 5px;
+  backdrop-filter: blur(5px);
+  z-index: 2;
 }
