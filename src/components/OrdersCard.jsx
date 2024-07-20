@@ -33,23 +33,23 @@ const OrdersCard = ({
                         </div>
                         <div className="item-details">
                             <div>
-                                <label for="item-name"><strong>ID: </strong></label>
+                                <label htmlFor="item-name"><strong>ID: </strong></label>
                                 <span id="item-name">{item.id}</span>
                             </div>
                             <div>
-                                <label for="item-name"><strong>Item Name: </strong></label>
+                                <label htmlFor="item-name"><strong>Item Name: </strong></label>
                                 <span id="item-name">{item.itemName}</span>
                             </div>
                             <div>
-                                <label for="price"><strong>Price: </strong></label>
+                                <label htmlFor="price"><strong>Price: </strong></label>
                                 <span id="price">{item.price}</span>
                             </div>
                             <div>
-                                <label for="quantity"><strong>Quantity: </strong></label>
+                                <label htmlFor="quantity"><strong>Quantity: </strong></label>
                                 <span id="quantity">{item.quantity}</span>
                             </div>
                             <div>
-                                <label for="quantity"><strong>Veg: </strong></label>
+                                <label htmlFor="quantity"><strong>Veg: </strong></label>
                                 <span id="quantity">{item.veg == true ? 'Yes' : 'No'}</span>
                             </div>
                         </div>
@@ -58,11 +58,11 @@ const OrdersCard = ({
             </div>
             <div className="sub-grand-total">
                 <div>
-                    <label for="subtotal"><strong>Sub total: </strong></label>
+                    <label htmlFor="subtotal"><strong>Sub total: </strong></label>
                     <span id="subtotal">{itemData.subtotal}</span>
                 </div>
                 <div>
-                    <label for="grandtotal"><strong>Grand total: </strong></label>
+                    <label htmlFor="grandtotal"><strong>Grand total: </strong></label>
                     <span id="grandtotal">{itemData.total}</span>
                 </div>
             </div>

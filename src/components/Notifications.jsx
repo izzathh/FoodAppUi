@@ -2,7 +2,6 @@ import { useFoodApp } from "../hooks/appProvider";
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import { GrRestaurant } from "react-icons/gr";
 import { IoRestaurantOutline } from "react-icons/io5";
-import moment from "moment";
 import axios from "axios";
 import { AuthContext } from "../context/protectedRoutes";
 const baseUrl = import.meta.env.VITE_BASE_URL
@@ -22,7 +21,7 @@ const Notifications = () => {
         getMinAgo
     } = useFoodApp();
 
-    const { adminType } = useContext(AuthContext);
+    const { adminType, adminRestaurantId } = useContext(AuthContext);
 
     const divRef = useRef(null);
     const [ordersData, setOrdersData] = useState([]);
@@ -52,7 +51,12 @@ const Notifications = () => {
 
     useEffect(() => {
         orders.map(item => {
-            if (!item.orderedAt.includes('mins')) {
+            if (
+                !item.orderedAt.includes('min') &&
+                !item.orderedAt.includes('hour') &&
+                !item.orderedAt.includes('just') &&
+                !item.orderedAt.includes('day')
+            ) {
                 item.orderedAt = getMinAgo(item.orderedAt)
             }
         })
@@ -61,7 +65,12 @@ const Notifications = () => {
 
     useEffect(() => {
         newDeliveryPeople?.map(people => {
-            if (!people.registeredAt?.includes('mins')) {
+            if (
+                !people.registeredAt?.includes('min') &&
+                !people.registeredAt?.includes('hour') &&
+                !people.registeredAt?.includes('just') &&
+                !people.registeredAt?.includes('day')
+            ) {
                 people.registeredAt = getMinAgo(people.registeredAt)
             }
         })
@@ -72,7 +81,7 @@ const Notifications = () => {
         if (openNotifications && adminType === 'shop-admin') {
             setLoadingNotification(true);
             const getPendingOrders = async () => {
-                const { data } = await axios.get(`${baseUrl}/admin-actions/get-pending-orders`);
+                const { data } = await axios.get(`${baseUrl}/admin-actions/get-pending-orders?id=${adminRestaurantId}`);
                 console.log('data:', data.orders);
                 setOrders(data.orders);
             }
@@ -211,7 +220,9 @@ const Notifications = () => {
             )}
             {deliveryJob && (
                 <DeliveryJobCard
-                    data={deliveryJob}
+                    deliveryJob={deliveryJob}
+                    setDeliveryJob={setDeliveryJob}
+                    setDeliveryJobData={setDeliveryJobData}
                 />
             )}
             {restaurantData && (

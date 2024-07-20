@@ -304,7 +304,7 @@ const AddEditMenu = ({
                             }}
                         />
                         {
-                            errors.itemName && <label for="itemName" className="error-label">{errors.itemName}</label>
+                            errors.itemName && <label htmlFor="itemName" className="error-label">{errors.itemName}</label>
                         }
                         <input
                             type="text"
@@ -319,7 +319,7 @@ const AddEditMenu = ({
                         />
                         {
                             errors.description &&
-                            <label for="description" className="error-label">{errors.description}</label>
+                            <label htmlFor="description" className="error-label">{errors.description}</label>
                         }
                         <input
                             id="fullDescription"
@@ -334,7 +334,7 @@ const AddEditMenu = ({
                         />
                         {
                             errors.fullDescription &&
-                            <label for="fullDescription" className="error-label">{errors.fullDescription}</label>
+                            <label htmlFor="fullDescription" className="error-label">{errors.fullDescription}</label>
                         }
                         <div
                             onDragOver={handleDragOver}
@@ -369,13 +369,13 @@ const AddEditMenu = ({
                                     </label>
                                     {
                                         errors.image &&
-                                        <label for="image" className="error-label">{errors.image}</label>
+                                        <label htmlFor="image" className="error-label">{errors.image}</label>
                                     }
                                 </>
                             )}
                         </div>
                         <div className="veg-checkbox">
-                            <label for="veg">Veg</label>
+                            <label htmlFor="veg">Veg</label>
                             <input
                                 type="checkbox"
                                 name="veg"
@@ -400,7 +400,7 @@ const AddEditMenu = ({
                         />
                         {
                             errors.price &&
-                            <label for="price" className="error-label">{errors.price}</label>
+                            <label htmlFor="price" className="error-label">{errors.price}</label>
                         }
                         <input
                             value={inputValues.offer || ''}
@@ -425,7 +425,7 @@ const AddEditMenu = ({
                         />
                         {
                             errors.address &&
-                            <label for="address" className="error-label">{errors.address}</label>
+                            <label htmlFor="address" className="error-label">{errors.address}</label>
                         }
                     </div>
                     <div className="add-edit-menu-btns">
@@ -445,236 +445,240 @@ const AddEditMenu = ({
                     </div>
                     <div className="category-table add-edit-menu-table">
                         <table>
-                            <tr>
-                                <th>Id</th>
-                                <th>Item</th>
-                                <th>Image</th>
-                                <th>Description</th>
-                                <th>Full Description</th>
-                                <th>Price</th>
-                                <th>Veg</th>
-                                <th>Offer</th>
-                                <th>Actions</th>
-                            </tr>
-                            {isLoading && <Loader />}
-                            {menu?.map((data, index) => (
-                                <tr key={index}>
-                                    <td>{data.id}</td>
-                                    <td>
-                                        {editMenu === index ? (
-                                            <>
-                                                <input
-                                                    id="itemName"
-                                                    value={editInputValues.itemName}
-                                                    type="text"
-                                                    name="itemName"
-                                                    placeholder="item name"
-                                                    onChange={(e) => {
-                                                        handleMenuValidation(e)
-                                                        setEditInputValues(pre => ({ ...pre, itemName: e.target.value }))
-                                                    }}
-                                                />
-                                                {
-                                                    errors.itemName &&
-                                                    <label for="itemName" className="error-label">{errors.itemName}</label>
-                                                }
-                                            </>
-                                        ) : (
-                                            <>
-                                                {data.itemName}
-                                            </>
-                                        )}
-                                    </td>
-                                    <td>
-                                        {editMenu === index ? (
-                                            <div
-                                                onDragOver={handleDragOver}
-                                                onDrop={handleEditDrop}
-                                                className="res-image-uploader menu-image-uploader"
-                                            >
-                                                {editImagePreview ? (
-                                                    <>
-                                                        <button
-                                                            onClick={() => {
-                                                                setEditImagePreview(null)
-                                                                setEditImageFile(null)
-                                                            }}
-                                                        >
-                                                            <IoCloseCircleOutline />
-                                                        </button>
-                                                        <img src={editImagePreview} className="restaurant-image" alt="image" />
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <p>Drag and drop a image or</p>
-                                                        <label className="img-upload-btn">
-                                                            <input
-                                                                id="image"
-                                                                name="image"
-                                                                type="file"
-                                                                accept=".jpg, .jpeg, .png"
-                                                                className="image-upload"
-                                                                onChange={handleMenuEditImageChange}
-                                                            />
-                                                            Browse Files
-                                                        </label>
-                                                        {
-                                                            errors.image &&
-                                                            <label for="image" className="error-label">{errors.image}</label>
-                                                        }
-                                                    </>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <img src={data.image} alt="item image" />
-                                        )}
-                                    </td>
-                                    <td>
-                                        {editMenu === index ? (
-                                            <>
-                                                <input
-                                                    id="description"
-                                                    value={editInputValues.description}
-                                                    type="input"
-                                                    name="description"
-                                                    placeholder="description"
-                                                    onChange={(e) => {
-                                                        handleMenuValidation(e)
-                                                        setEditInputValues(pre => ({ ...pre, description: e.target.value }))
-                                                    }}
-                                                />
-                                                {
-                                                    errors.description &&
-                                                    <label for="description" className="error-label">{errors.description}</label>
-                                                }
-                                            </>
-                                        ) : (
-                                            <>
-                                                {data.description}
-                                            </>
-                                        )}
-                                    </td>
-                                    <td>
-                                        {editMenu === index ? (
-                                            <>
-                                                <textarea
-                                                    id="fullDescription"
-                                                    value={editInputValues.fullDescription}
-                                                    type="text"
-                                                    name="fullDescription"
-                                                    placeholder="full description"
-                                                    onChange={(e) => {
-                                                        handleMenuValidation(e)
-                                                        setEditInputValues(pre => ({ ...pre, fullDescription: e.target.value }))
-                                                    }}
-                                                />
-                                                {
-                                                    errors.fullDescription &&
-                                                    <label for="fullDescription" className="error-label">{errors.fullDescription}</label>
-                                                }
-                                            </>
-                                        ) : (
-                                            <>
-                                                {data.fullDescription}
-                                            </>
-                                        )}
-                                    </td>
-                                    <td>
-                                        {editMenu === index ? (
-                                            <>
-                                                <input
-                                                    id="price"
-                                                    value={editInputValues.price}
-                                                    type="number"
-                                                    name="price"
-                                                    placeholder="price"
-                                                    onChange={(e) => {
-                                                        handleMenuValidation(e)
-                                                        setEditInputValues((pre) => ({ ...pre, price: e.target.value }))
-                                                    }}
-                                                />
-                                                {
-                                                    errors.price &&
-                                                    <label for="price" className="error-label">{errors.price}</label>
-                                                }
-                                            </>
-                                        ) : (
-                                            <>
-                                                {data.price}
-                                            </>
-                                        )}
-                                    </td>
-                                    <td className="veg-check">
-                                        {editMenu === index ? (
-                                            <input
-                                                onClick={(e) => {
-                                                    setEditVeg(e.target.checked)
-                                                }}
-                                                checked={editVeg}
-                                                id="veg"
-                                                type="checkbox"
-                                            />
-                                        ) : (
-                                            <input
-                                                checked={data.veg == 'true'}
-                                                disabled
-                                                id="veg"
-                                                type="checkbox"
-                                            />
-                                        )}
-                                    </td>
-                                    <td>
-                                        {editMenu === index ? (
-                                            <input
-                                                id="offer"
-                                                value={editInputValues.offer}
-                                                type="input"
-                                                name="offer"
-                                                placeholder="offer"
-                                                onChange={(e) => {
-                                                    setEditInputValues((pre) => ({ ...pre, offer: e.target.value }))
-                                                }}
-                                            />
-                                        ) : (
-                                            <>
-                                                {data.offer}
-                                            </>
-                                        )}
-                                    </td>
-                                    <td className="category-edit-delete menuitem-edit-delete">
-                                        <button
-                                            onClick={() => handleEditClick(data, index)}
-                                            className={`${editMenu === index ? 'category-edit-close' : 'category-edit'}`}
-                                        >
-                                            {editMenu === index ? (
-                                                <MdOutlineEditOff />
-                                            ) : (
-                                                <FaRegEdit />
-                                            )}
-                                        </button>
-                                        <br />
-                                        <br />
-                                        <button
-                                            onClick={() => handleMenuDeleteClick(data.id)}
-                                            className="category-delete"
-                                        >
-                                            <RiDeleteBin5Line />
-                                        </button>
-                                        {editMenu === index && (
-                                            <>
-                                                <br />
-                                                <br />
-                                                <button
-                                                    onClick={handleSaveEditChanges}
-                                                    className="save-edited-changes"
-                                                >
-                                                    <RiSaveLine />
-                                                </button>
-                                            </>
-                                        )}
-                                    </td>
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Item</th>
+                                    <th>Image</th>
+                                    <th>Description</th>
+                                    <th>Full Description</th>
+                                    <th>Price</th>
+                                    <th>Veg</th>
+                                    <th>Offer</th>
+                                    <th>Actions</th>
                                 </tr>
-                            ))}
+                            </thead>
+                            {isLoading && <Loader />}
+                            <tbody>
+                                {menu?.map((data, index) => (
+                                    <tr key={index}>
+                                        <td>{data.id}</td>
+                                        <td>
+                                            {editMenu === index ? (
+                                                <>
+                                                    <input
+                                                        id="itemName"
+                                                        value={editInputValues.itemName}
+                                                        type="text"
+                                                        name="itemName"
+                                                        placeholder="item name"
+                                                        onChange={(e) => {
+                                                            handleMenuValidation(e)
+                                                            setEditInputValues(pre => ({ ...pre, itemName: e.target.value }))
+                                                        }}
+                                                    />
+                                                    {
+                                                        errors.itemName &&
+                                                        <label htmlFor="itemName" className="error-label">{errors.itemName}</label>
+                                                    }
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {data.itemName}
+                                                </>
+                                            )}
+                                        </td>
+                                        <td>
+                                            {editMenu === index ? (
+                                                <div
+                                                    onDragOver={handleDragOver}
+                                                    onDrop={handleEditDrop}
+                                                    className="res-image-uploader menu-image-uploader"
+                                                >
+                                                    {editImagePreview ? (
+                                                        <>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditImagePreview(null)
+                                                                    setEditImageFile(null)
+                                                                }}
+                                                            >
+                                                                <IoCloseCircleOutline />
+                                                            </button>
+                                                            <img src={editImagePreview} className="restaurant-image" alt="image" />
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <p>Drag and drop a image or</p>
+                                                            <label className="img-upload-btn">
+                                                                <input
+                                                                    id="image"
+                                                                    name="image"
+                                                                    type="file"
+                                                                    accept=".jpg, .jpeg, .png"
+                                                                    className="image-upload"
+                                                                    onChange={handleMenuEditImageChange}
+                                                                />
+                                                                Browse Files
+                                                            </label>
+                                                            {
+                                                                errors.image &&
+                                                                <label htmlFor="image" className="error-label">{errors.image}</label>
+                                                            }
+                                                        </>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <img src={data.image} alt="item image" />
+                                            )}
+                                        </td>
+                                        <td>
+                                            {editMenu === index ? (
+                                                <>
+                                                    <input
+                                                        id="description"
+                                                        value={editInputValues.description}
+                                                        type="input"
+                                                        name="description"
+                                                        placeholder="description"
+                                                        onChange={(e) => {
+                                                            handleMenuValidation(e)
+                                                            setEditInputValues(pre => ({ ...pre, description: e.target.value }))
+                                                        }}
+                                                    />
+                                                    {
+                                                        errors.description &&
+                                                        <label htmlFor="description" className="error-label">{errors.description}</label>
+                                                    }
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {data.description}
+                                                </>
+                                            )}
+                                        </td>
+                                        <td>
+                                            {editMenu === index ? (
+                                                <>
+                                                    <textarea
+                                                        id="fullDescription"
+                                                        value={editInputValues.fullDescription}
+                                                        type="text"
+                                                        name="fullDescription"
+                                                        placeholder="full description"
+                                                        onChange={(e) => {
+                                                            handleMenuValidation(e)
+                                                            setEditInputValues(pre => ({ ...pre, fullDescription: e.target.value }))
+                                                        }}
+                                                    />
+                                                    {
+                                                        errors.fullDescription &&
+                                                        <label htmlFor="fullDescription" className="error-label">{errors.fullDescription}</label>
+                                                    }
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {data.fullDescription}
+                                                </>
+                                            )}
+                                        </td>
+                                        <td>
+                                            {editMenu === index ? (
+                                                <>
+                                                    <input
+                                                        id="price"
+                                                        value={editInputValues.price}
+                                                        type="number"
+                                                        name="price"
+                                                        placeholder="price"
+                                                        onChange={(e) => {
+                                                            handleMenuValidation(e)
+                                                            setEditInputValues((pre) => ({ ...pre, price: e.target.value }))
+                                                        }}
+                                                    />
+                                                    {
+                                                        errors.price &&
+                                                        <label htmlFor="price" className="error-label">{errors.price}</label>
+                                                    }
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {data.price}
+                                                </>
+                                            )}
+                                        </td>
+                                        <td className="veg-check">
+                                            {editMenu === index ? (
+                                                <input
+                                                    onClick={(e) => {
+                                                        setEditVeg(e.target.checked)
+                                                    }}
+                                                    checked={editVeg}
+                                                    id="veg"
+                                                    type="checkbox"
+                                                />
+                                            ) : (
+                                                <input
+                                                    checked={data.veg == 'true'}
+                                                    disabled
+                                                    id="veg"
+                                                    type="checkbox"
+                                                />
+                                            )}
+                                        </td>
+                                        <td>
+                                            {editMenu === index ? (
+                                                <input
+                                                    id="offer"
+                                                    value={editInputValues.offer}
+                                                    type="input"
+                                                    name="offer"
+                                                    placeholder="offer"
+                                                    onChange={(e) => {
+                                                        setEditInputValues((pre) => ({ ...pre, offer: e.target.value }))
+                                                    }}
+                                                />
+                                            ) : (
+                                                <>
+                                                    {data.offer}
+                                                </>
+                                            )}
+                                        </td>
+                                        <td className="category-edit-delete menuitem-edit-delete">
+                                            <button
+                                                onClick={() => handleEditClick(data, index)}
+                                                className={`${editMenu === index ? 'category-edit-close' : 'category-edit'}`}
+                                            >
+                                                {editMenu === index ? (
+                                                    <MdOutlineEditOff />
+                                                ) : (
+                                                    <FaRegEdit />
+                                                )}
+                                            </button>
+                                            <br />
+                                            <br />
+                                            <button
+                                                onClick={() => handleMenuDeleteClick(data.id)}
+                                                className="category-delete"
+                                            >
+                                                <RiDeleteBin5Line />
+                                            </button>
+                                            {editMenu === index && (
+                                                <>
+                                                    <br />
+                                                    <br />
+                                                    <button
+                                                        onClick={handleSaveEditChanges}
+                                                        className="save-edited-changes"
+                                                    >
+                                                        <RiSaveLine />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
                         </table>
                     </div>
                 </>

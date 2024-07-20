@@ -276,7 +276,7 @@ const ResgisterRestaurant = () => {
                     <div className="vegoffer-addresscity-cont">
                         <div className="veg-offer">
                             <div className="veg-checkbox">
-                                <label for="veg">Veg</label>
+                                <label htmlFor="veg">Veg</label>
                                 <input
                                     value={veg}
                                     checked={veg}

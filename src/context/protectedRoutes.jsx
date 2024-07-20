@@ -14,6 +14,7 @@ const AuthProvider = ({ children }) => {
     const [adminType, setAdminType] = useState('');
     const [loading, setLoading] = useState(true);
     const [adminRestaurantId, setAdminRestaurantId] = useState('');
+    const [adminId, setAdminId] = useState('');
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -39,6 +40,7 @@ const AuthProvider = ({ children }) => {
                 if (!token) return
                 const decoded = jwtDecode(token)
                 setAdminType(decoded.adminType)
+                setAdminId(decoded.id)
                 if (decoded.adminType === 'shop-admin') setAdminRestaurantId(decoded.restaurantId)
             } catch (error) {
                 console.log('error:', error);
@@ -48,7 +50,7 @@ const AuthProvider = ({ children }) => {
     }, [adminType])
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, loading, adminType, adminRestaurantId }}>
+        <AuthContext.Provider value={{ isAuthenticated, loading, adminType, adminRestaurantId, adminId }}>
             {children}
         </AuthContext.Provider>
     )

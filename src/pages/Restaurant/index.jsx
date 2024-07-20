@@ -18,7 +18,8 @@ const Restaurant = () => {
     useEffect(() => {
         async function getRestaurants() {
             const allRes = await getAllRestaurants();
-            setRestaurants(allRes.restaurants);
+            console.log('allRes:', allRes);
+            setRestaurants(allRes.data.restaurants);
         }
         getRestaurants();
     }, [])

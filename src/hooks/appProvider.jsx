@@ -25,13 +25,33 @@ export const FoodAppProvider = ({ children }) => {
     const [animateBell, setAnimateBell] = useState(false);
     const [mainBlurred, setMainBlurred] = useState(false);
     const [orderList, setOrderList] = useState([])
-    const { adminType } = useContext(AuthContext)
+    const [dishes, setDishes] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [subCategories, setSubCategories] = useState([]);
+
+    const { adminType, adminId, adminRestaurantId } = useContext(AuthContext);
+
+    const client = axios.create({ baseURL: baseUrl })
+
+    const IsValidJson = (data) => {
+        try {
+            JSON.parse(data)
+        } catch (error) {
+            return false
+        }
+        return true
+    }
 
     const getMinAgo = (orderTime) => {
         const currentTime = moment();
         const diff = currentTime.diff(orderTime)
         const timeDur = moment.duration(diff)
-        return timeDur.minutes() == 0 ? 'just now' : `${timeDur.minutes()} mins ago`
+        const checkDur = timeDur.days() != 0
+            ? `${timeDur.days()} day${timeDur.days() > 1 ? 's' : ''} ago`
+            : timeDur.hours() != 0
+                ? `${timeDur.hours()} hour${timeDur.hours() > 1 ? 's' : ''} ago`
+                : timeDur.minutes() == 0 ? 'just now' : `${timeDur.minutes()} min${timeDur.minutes() > 1 ? 's' : ''} ago`
+        return checkDur;
     }
 
     useEffect(() => {
@@ -40,9 +60,7 @@ export const FoodAppProvider = ({ children }) => {
             console.log('connected to web socker server');
         }
         ws.onmessage = (e) => {
-            const message = JSON.parse(e.data);
-            console.log('message:', message);
-            console.log('adminType:', adminType);
+            const message = IsValidJson(e.data) ? JSON.parse(e.data) : e.data;
             if (message.type === 'newOrder' && adminType === 'shop-admin') {
                 playNotificationSound();
                 setSuccessToast('An Order Received')
@@ -56,13 +74,11 @@ export const FoodAppProvider = ({ children }) => {
                 )
             } else if (message.type === 'newRestaurant' && adminType === 'admin') {
                 playNotificationSound();
-                console.log('new restaurant');
                 setAnimateBell(true);
                 message.data.registeredAt = getMinAgo(message.data.registeredAt)
                 setNewRestaurants((prev) => [...prev, message.data])
             } else if (message.type === 'newDeliveryPeople' && adminType === 'admin') {
                 playNotificationSound();
-                console.log('new delivery people');
                 setAnimateBell(true);
                 setNewDeliveryPeople((prev) => [...prev, message.application])
             }
@@ -122,9 +138,8 @@ export const FoodAppProvider = ({ children }) => {
                 },
             });
 
-            if (data.status === '1') {
+            if (data.status === 1) {
                 setSuccessToast('Restaurant added!')
-                console.log('data:', data);
                 return data;
             }
             setErrorToast(data.message)
@@ -186,7 +201,7 @@ export const FoodAppProvider = ({ children }) => {
                 }
             })
 
-            if (data.status === '1') {
+            if (data.status === 1) {
                 setSuccessToast('Restaurant updated!')
                 return data;
             }
@@ -222,7 +237,7 @@ export const FoodAppProvider = ({ children }) => {
                         const { data } = await axios
                             .delete(`${baseUrl}/admin-actions/delete-restaurant?id=${id}`)
                         const getAllRes = await getAllRestaurants();
-                        setRestaurants(getAllRes.restaurants)
+                        setRestaurants(getAllRes.data.restaurants)
                         return data;
                     }
                 },
@@ -262,7 +277,7 @@ export const FoodAppProvider = ({ children }) => {
                 }
             })
 
-            if (data.status === '1') {
+            if (data.status === 1) {
                 setSuccessToast('Item added successfully!')
                 if (another) {
                     return
@@ -300,7 +315,7 @@ export const FoodAppProvider = ({ children }) => {
                 }
             })
 
-            if (data.status === '1') {
+            if (data.status === 1) {
                 setSuccessToast('Menu updated!')
                 return data;
             }
@@ -380,6 +395,34 @@ export const FoodAppProvider = ({ children }) => {
         audio.play();
     };
 
+    const getAllCategory = async () => {
+        try {
+            const { data } = await client
+                .get(`admin-actions/get-all-categories/${adminRestaurantId}`)
+            if (data.status === 1 && data.categories.length !== 0) {
+                return data.categories
+            }
+            return []
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const getAllSubCategory = async () => {
+        try {
+            const { data } = await client
+                .get(`admin-actions/get-all-subcategories/${adminRestaurantId}`)
+            if (data.status === 1 && data.subcategories.length !== 0) {
+                return data.subcategories
+            }
+            return []
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+
+
     return (
         <FoodAppContext.Provider
             value={{
@@ -420,7 +463,16 @@ export const FoodAppProvider = ({ children }) => {
                 setOrderList,
                 newDeliveryPeople,
                 setNewDeliveryPeople,
-                getMinAgo
+                getMinAgo,
+                dishes,
+                setDishes,
+                categories,
+                setCategories,
+                client,
+                subCategories,
+                setSubCategories,
+                getAllCategory,
+                getAllSubCategory
             }}
         >
             {children}

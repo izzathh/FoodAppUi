@@ -39,14 +39,14 @@ const ProfileSettings = () => {
                     <span>Dark Mode</span>
                     <div className="darkmode-switch">
                         <input className="switch-toggle1" type="checkbox" id="switch1" />
-                        <label className="darkmode-lable" for="switch1">Toggle</label>
+                        <label className="darkmode-lable" htmlFor="switch1">Toggle</label>
                     </div>
                 </div>
                 <div className="allow-notification">
                     <span>Allow Notifications</span>
                     <div className="allownotify-switch">
                         <input className="switch-toggle2" type="checkbox" id="switch2" />
-                        <label className="allownotify-lable" for="switch2">Toggle</label>
+                        <label className="allownotify-lable" htmlFor="switch2">Toggle</label>
                     </div>
                 </div>
             </div>

@@ -9,7 +9,14 @@ import { useFoodApp } from "../../hooks/appProvider";
 import Loader from "../../components/Loader";
 
 const RestaurantOrders = () => {
-    const { setMainBlurred, orderList, setOrderList } = useFoodApp();
+    const {
+        setMainBlurred,
+        orderList,
+        setOrderList,
+        setErrorToast,
+        setSuccessToast,
+        confirmAlert
+    } = useFoodApp();
     const { adminRestaurantId } = useContext(AuthContext);
     const [openOrderedDishesCard, setOpenOrderedDishesCard] = useState(null)
     const [orderMenu, setOrderMenu] = useState(null)
@@ -41,6 +48,51 @@ const RestaurantOrders = () => {
             document.removeEventListener('mousedown', handleOutsideClick)
         }
     }, [])
+
+    const confirmOrderDelete = (orderId) => {
+        confirmAlert({
+            title: "Confirm to delete!",
+            message: "Are you sure to delete this order?",
+            buttons: [
+                {
+                    label: "Yes",
+                    onClick: async () => {
+                        await deleteUserOrder(orderId);
+                        return
+                    }
+                },
+                {
+                    label: "No",
+                    onClick: () => { return }
+                }
+            ]
+        });
+    }
+
+    const deleteUserOrder = async (orderId) => {
+        try {
+            isLoading(true)
+            const { data } = await axios.delete(`${baseUrl}/admin-actions/delete-order`, {
+                data: {
+                    restaurantId: adminRestaurantId,
+                    orderId
+                }
+            })
+            isLoading(false)
+            if (data.status === 1) {
+                setSuccessToast(data.message)
+                setOrderList((prev) =>
+                    prev.filter(order => order.orderId !== orderId)
+                )
+                return
+            }
+            setErrorToast(data.message)
+            return
+        } catch (error) {
+            console.error(error);
+            isLoading(false)
+        }
+    }
 
     return (
         <div className="categories-container orders-containder">
@@ -91,6 +143,9 @@ const RestaurantOrders = () => {
                                             </button>
                                             <button
                                                 className="category-delete"
+                                                onClick={async () => {
+                                                    confirmOrderDelete(order.orderId)
+                                                }}
                                             >
                                                 <RiDeleteBin5Line />
                                             </button>

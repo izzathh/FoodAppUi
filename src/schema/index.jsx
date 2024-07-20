@@ -44,3 +44,11 @@ export const RegisterRestaurantValidation = Yup.object().shape({
     description: Yup.string().max(25, 'description must be 25 chars at maximum').required('description is required'),
     fullDescription: Yup.string().required('full description is required'),
 })
+
+export const newCategoryValidation = Yup.object().shape({
+    category: Yup.string().required('Category is required').max(20, 'category must be 20 chars at maximum')
+})
+
+export const newSubCategoryValidation = Yup.object().shape({
+    subcategory: Yup.string().required('Sub category is required').max(20, 'sub category must be 20 chars at maximum')
+})

@@ -1,6 +1,8 @@
 import axios from "axios";
 const baseUrl = import.meta.env.VITE_BASE_URL
 import { useFoodApp } from "../hooks/appProvider";
+import { AuthContext } from "../context/protectedRoutes";
+import { useContext } from "react";
 
 export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData }) => {
     const {
@@ -9,12 +11,15 @@ export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData
         setOrders
     } = useFoodApp();
 
+    const { adminRestaurantId } = useContext(AuthContext);
+
     const handleStatusChange = async (confirmed) => {
         try {
             const { data } = await axios.post(`${baseUrl}/admin-actions/update-order-status`,
                 {
                     orderId: id,
-                    status: confirmed
+                    status: confirmed,
+                    restaurantId: adminRestaurantId
                 }
             )
             if (data.status === 1) {
@@ -58,25 +63,25 @@ export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData
                     </div>
                     <div className="item-name-quantity">
                         <div>
-                            <label for="itemName">
+                            <label htmlFor="itemName">
                                 <strong>Item Name: </strong>
                             </label>
                             <span id="itemName">{data.itemName}</span>
                         </div>
                         <div>
-                            <label for="quantity">
+                            <label htmlFor="quantity">
                                 <strong>Quantity: </strong>
                             </label>
                             <span id="quantity">{data.quantity}</span>
                         </div>
                         <div>
-                            <label for="price">
+                            <label htmlFor="price">
                                 <strong>Price: </strong>
                             </label>
                             <span id="price">{data.price}</span>
                         </div>
                         <div>
-                            <label for="total">
+                            <label htmlFor="total">
                                 <strong>Total: </strong>
                             </label>
                             <span id="total">{data.price}</span>
@@ -102,8 +107,7 @@ export const RestaurantCard = ({
     const {
         setSuccessToast,
         setErrorToast,
-        setRestaurants,
-        getAllRestaurants
+        setRestaurants
     } = useFoodApp();
 
     const handleStatusChange = async (confirmed) => {
@@ -123,8 +127,17 @@ export const RestaurantCard = ({
                     prev.filter(data => data.restaurantId !== restaurantData[0]._id)
                 )
                 if (confirmed) {
-                    const allRes = await getAllRestaurants();
-                    setRestaurants(allRes.restaurants);
+                    setRestaurants(prev =>
+                        [...prev, {
+                            _id: data.updateRestaurant._id,
+                            image: data.updateRestaurant.image,
+                            restaurantName: data.updateRestaurant.restaurantName,
+                            rating: data.updateRestaurant.rating,
+                            deliveryTime: data.updateRestaurant.deliveryTime,
+                            address: data.updateRestaurant.address,
+                            city: data.updateRestaurant.city,
+                        }]
+                    )
                 }
                 confirmed
                     ? setSuccessToast('Restaurant added successfully')
@@ -148,19 +161,19 @@ export const RestaurantCard = ({
             <div className="card-contents">
                 <div className="item-name-quantity">
                     <div>
-                        <label for="restauranName">
+                        <label htmlFor="restauranName">
                             <strong>Restaurant Name: </strong>
                         </label>
                         <span id="restauranName">{restaurantData[0].restaurantName}</span>
                     </div>
                     <div>
-                        <label for="address">
+                        <label htmlFor="address">
                             <strong>Address: </strong>
                         </label>
                         <span id="address">{restaurantData[0].address}, {restaurantData[0].city}</span>
                     </div>
                     <div>
-                        <label for="fullDescription">
+                        <label htmlFor="fullDescription">
                             <strong>Description: </strong>
                         </label>
                         <span id="fullDescription">{restaurantData[0].fullDescription}</span>
@@ -175,7 +188,42 @@ export const RestaurantCard = ({
     )
 }
 
-export const DeliveryJobCard = ({ data }) => {
+export const DeliveryJobCard = ({ deliveryJob, setDeliveryJob, setDeliveryJobData }) => {
+
+    const {
+        setSuccessToast,
+        setErrorToast,
+        setNewDeliveryPeople
+    } = useFoodApp();
+
+    const handleStatusChange = async (confirmed) => {
+        try {
+            console.log('confirmed:', deliveryJob._id, confirmed);
+            const { data } = await axios.post(`${baseUrl}/admin-actions/update-deliveryjob-status`,
+                {
+                    id: deliveryJob._id,
+                    adminApproved: confirmed,
+                }
+            )
+            if (data.status === 1) {
+                setNewDeliveryPeople((prev) =>
+                    prev.filter(data => deliveryJob._id !== data._id)
+                )
+                setDeliveryJobData((prev) =>
+                    prev.filter(data => deliveryJob._id !== data._id)
+                )
+                setDeliveryJob(null)
+                confirmed
+                    ? setSuccessToast(`${deliveryJob.name} has been assigned for the delivery job`)
+                    : setErrorToast('Job request declined')
+                return
+            }
+            setErrorToast(data.message)
+        } catch (error) {
+            console.error('error:', error);
+        }
+    }
+
     return (
         <div className="menu-list-card">
             <div className="card-title">
@@ -184,22 +232,22 @@ export const DeliveryJobCard = ({ data }) => {
             <div className="card-contents">
                 <div className="item-name-quantity">
                     <div>
-                        <label for="name">
+                        <label htmlFor="name">
                             <strong>Name: </strong>
                         </label>
-                        <span id="name">{data.name}</span>
+                        <span id="name">{deliveryJob.name}</span>
                     </div>
                     <div>
-                        <label for="phoneNumber">
+                        <label htmlFor="phoneNumber">
                             <strong>Phone Number: </strong>
                         </label>
-                        <span id="phoneNumber">{data.phoneNumber}</span>
+                        <span id="phoneNumber">{deliveryJob.phoneNumber}</span>
                     </div>
                     <div>
-                        <label for="vehicleNumber">
+                        <label htmlFor="vehicleNumber">
                             <strong>Vehicle Number: </strong>
                         </label>
-                        <span id="vehicleNumber">{data.vehicleNumber}</span>
+                        <span id="vehicleNumber">{deliveryJob.vehicleNumber}</span>
                     </div>
                 </div>
             </div>
