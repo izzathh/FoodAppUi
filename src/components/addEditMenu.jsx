@@ -1,3 +1,4 @@
+import { FiLoader } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import { EditRestaurantValidation, RestaurantImgValidation, EditMenuValidation } from "../schema";
 import { useFoodApp } from "../hooks/appProvider";
@@ -458,8 +459,12 @@ const AddEditMenu = ({
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            {isLoading && <Loader />}
                             <tbody>
+                                {isLoading &&
+                                    <div className="add-dishes-submit app-admin">
+                                        <FiLoader />
+                                    </div>
+                                }
                                 {menu?.map((data, index) => (
                                     <tr key={index}>
                                         <td>{data.id}</td>

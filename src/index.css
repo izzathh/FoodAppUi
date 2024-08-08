@@ -429,7 +429,7 @@ div#root {
   width: -webkit-fill-available;
   height: -webkit-fill-available;
   overflow-y: auto !important;
-  margin-top: 100px;
+  margin-top: 80px;
   transition: margin-left 0.5s ease;
 }
 
@@ -540,8 +540,10 @@ button.menu-button:hover {
 
 main {
   margin: auto;
+  margin-top: 2em;
   display: flex;
   justify-content: center;
+  overflow-y: hidden;
 }
 
 .restaurant-container {
@@ -937,7 +939,7 @@ main {
   padding-bottom: 1em;
   opacity: 1;
   width: -webkit-fill-available;
-  animation: addresturatantopen 1s ease-in-out forwards;
+  animation: addresturatantopen 0.5s ease-in-out forwards;
 }
 
 .restaurant-resgister-container {
@@ -953,11 +955,11 @@ main {
   width: 100%;
 }
 
-.close-add-restaurant-container {
-  animation: addresturatant 1s ease-in-out forwards;
-}
+/* .close-add-restaurant-container {
+  display: none;
+} */
 
-@keyframes addresturatant {
+/* @keyframes addresturatant {
   from {
     display: flex;
     opacity: 1;
@@ -969,7 +971,7 @@ main {
     opacity: 0;
     transform: translateX(-52vw);
   }
-}
+} */
 
 @keyframes addresturatantopen {
   from {
@@ -994,7 +996,7 @@ main {
   align-items: center;
   margin: auto;
   opacity: 0;
-  animation: menucontainer 1s ease-in-out forwards;
+  animation: menucontainer 0.5s ease-in-out forwards;
 }
 
 @keyframes menucontainer {
@@ -1009,6 +1011,17 @@ main {
     opacity: 1;
     transform: translateX(0em);
   }
+}
+
+.add-dishes-submit.app-admin {
+  width: 100%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+}
+
+.add-dishes-submit.app-admin svg {
+  font-size: -webkit-xxx-large;
 }
 
 .close-add-edit-menu-container {
@@ -1397,7 +1410,7 @@ p.add-res-error5 {
   width: 100%;
   position: relative;
   align-items: center;
-  padding: 0 3em;
+  padding: 0 2em;
   margin: auto;
   gap: 1em;
   font-family: 'Main-Font';
@@ -1447,9 +1460,14 @@ p.add-res-error5 {
 
 .category-table table {
   width: 100%;
+  min-height: 8em;
   border-collapse: collapse;
   margin-bottom: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.category-table tbody {
+  position: relative;
 }
 
 table th {
@@ -1839,7 +1857,6 @@ span.no-notify {
   display: flex;
   flex-direction: column;
   gap: 1em;
-  width: 100%;
 }
 
 .add-edit-menu-fields input {
@@ -1931,11 +1948,12 @@ span.no-notify {
 
 .menu-page-head button {
   font-size: large;
+  position: absolute;
   color: #c03dd4;
   background-color: #ede7f6;
   border: 1px solid #c03dd4;
-  padding: 0.5em 1em;
-  border-radius: 5px;
+  padding: 0.3em 1em;
+  border-radius: .125rem;
   transition: all 0.2s ease;
 
   &:hover {
@@ -1991,10 +2009,15 @@ label.error-label {
   letter-spacing: 1px;
   display: flex;
   flex-direction: column;
+  height: 100%;
   width: 100%;
   gap: 1em;
   overflow-y: auto;
   animation: manulistopen 0.5s ease-in-out forwards;
+}
+
+.menu-list-card.menu-items {
+  overflow-y: none;
 }
 
 @keyframes manulistopen {
@@ -2352,12 +2375,152 @@ label.error-label {
   text-align: center;
 }
 
-.category-select-error {
+.category-select-error,
+.sub-category-select-error {
   position: relative;
 }
 
-label.select-category-error {
+label.select-category-error,
+label.select-sub-category-error {
   width: 100%;
   text-align: center;
   bottom: auto;
+}
+
+.dishes-form-fields {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  width: 100%;
+}
+
+.dishes-form-fields input[type="text"],
+.dishes-form-fields select {
+  height: 2.5em;
+  width: 25em;
+  font-size: large;
+  font-family: 'Main-Font';
+  letter-spacing: 1px;
+  padding: 0 10px;
+  border-radius: .125rem;
+  border: none;
+}
+
+.dishes-form-fields select {
+  width: 26em;
+}
+
+.dishes-veg-delivery {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.dishes-veg-delivery div {
+  display: inline-grid;
+}
+
+.dishes-form-cont {
+  width: 40em;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar {
+  background-color: #dfdfdf;
+  width: 12px;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(.5, #c03dd457), color-stop(1, #0373c563));
+  border-radius: 10px;
+}
+
+h1.add-dishes-title {
+  margin: 0;
+  width: auto;
+}
+
+.add-dishes-submit {
+  display: flex;
+  gap: 1em;
+  height: 2.5em;
+  margin: 1em 0;
+}
+
+.add-dishes-submit button {
+  width: 6em;
+  font-size: large;
+  border-radius: .125rem;
+}
+
+.add-dishes-submit button:first-of-type {
+  border: 1px solid #c03dd4;
+  background-color: #ede7f6;
+  color: #c03dd4;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    border: 1px solid #ede7f6;
+    background-color: #c03dd4;
+    color: #ede7f6;
+  }
+}
+
+.add-dishes-submit button:last-of-type {
+  border: 1px solid #d43d3d;
+  background-color: #f6e7e7;
+  color: #d43d3d;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    border: 1px solid #f6e7e7;
+    background-color: #d43d3d;
+    color: #f6e7e7;
+  }
+}
+
+.dishes-form-fields .error-label {
+  display: block;
+  width: 100%;
+  text-align: start;
+}
+
+.res-image-uploader .error-label {
+  text-align: center;
+}
+
+.menu-list-card .card {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.menu-page-head.dish-edit {
+  width: 29em;
+  justify-content: space-between;
+}
+
+.add-dishes-submit svg {
+  font-size: x-large;
+  margin-top: 5px;
+  animation: loaderSpin 1s linear infinite;
+}
+
+@keyframes loaderSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }

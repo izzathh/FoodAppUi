@@ -20,6 +20,7 @@ const Category = () => {
         setSuccessToast,
         categories,
         setCategories,
+        setSubCategories,
         client,
         confirmAlert,
         getAllCategory
@@ -45,6 +46,15 @@ const Category = () => {
                     prev.map(data => {
                         if (data._id === id) {
                             return { ...data, categoryName: updatedCategory };
+                        }
+                        return data
+                    })
+                )
+                setSubCategories((prev) =>
+                    prev.map(data => {
+                        console.log('categoryId:', data.categoryId, id);
+                        if (data.categoryId === id) {
+                            return { ...data, categoryId: id, categoryName: updatedCategory }
                         }
                         return data
                     })
@@ -216,6 +226,7 @@ const Category = () => {
                     </div>
                 )}
             </div>
+
             <div className="category-table">
                 <table>
                     <thead>

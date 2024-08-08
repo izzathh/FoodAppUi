@@ -39,7 +39,7 @@ const Navbar = () => {
                             fill: 'url(#gradient1)'
                         }}
                     />
-                    <span>Food App</span>
+                    <span>FOOD APP</span>
                 </div>
                 <div>
                     <button onClick={() => setCloseMenu(!closeMenu)} className="menu-button">

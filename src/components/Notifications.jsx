@@ -78,7 +78,7 @@ const Notifications = () => {
     }, [newDeliveryPeople])
 
     useEffect(() => {
-        if (openNotifications && adminType === 'shop-admin') {
+        if (openNotifications && adminType === 'shop-admin' && orders.length === 0) {
             setLoadingNotification(true);
             const getPendingOrders = async () => {
                 const { data } = await axios.get(`${baseUrl}/admin-actions/get-pending-orders?id=${adminRestaurantId}`);
@@ -88,7 +88,7 @@ const Notifications = () => {
             getPendingOrders();
             setLoadingNotification(false);
             console.log('orders:', orders);
-        } else if (openNotifications && adminType === 'admin') {
+        } else if (openNotifications && adminType === 'admin' && newRestaurants.length === 0) {
             setLoadingNotification(true);
             const getRestaurantRequests = async () => {
                 const { data } = await axios

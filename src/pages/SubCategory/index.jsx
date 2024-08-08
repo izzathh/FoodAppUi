@@ -11,8 +11,11 @@ import { RiSaveLine } from "react-icons/ri";
 const SubCategory = () => {
     const [openSubcategoryInput, setOpenSubcategoryInput] = useState(false);
     const [newSubCategory, setNewSubCategory] = useState('');
-    const [updatedSubCategory, setUpdatedSubCategory] = useState('');
-    const [updatedCategory, setUpdatedCategory] = useState(null);
+    const [updatedCatSubCat, setUpdatedCatSubCat] = useState({
+        updatedCategory: null,
+        updatedSubCategory: null,
+        updatedCategoryId: null
+    });
     const [errors, setErrors] = useState({});
     const [isSaving, setIsSaving] = useState({});
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -38,7 +41,7 @@ const SubCategory = () => {
                 if (sub.subCategoryName.toLowerCase() === e.target.value.toLowerCase())
                     throw new Error('This sub category already exists')
             })
-            if (selectedCategory.value.toLowerCase() === e.target.value.toLowerCase())
+            if (selectedCategory?.value.toLowerCase() === e.target.value.toLowerCase())
                 throw new Error('Sub category connot be the same as category')
             await newSubCategoryValidation.validate({ subcategory: e.target.value })
             setErrors(prev => ({ ...prev, subcategory: '' }))
@@ -140,22 +143,60 @@ const SubCategory = () => {
     }
 
     const handleUpdateCategoryChange = (e) => {
-        setUpdatedCategory(e.target.value)
+        const selectedOptionId = e.target.options[e.target.selectedIndex]
+        setUpdatedCatSubCat((prev) => ({
+            ...prev,
+            updatedCategory: e.target.value,
+            updatedCategoryId: selectedOptionId.dataset.id
+        }))
     }
 
     const handleUpdateSubCatClick = async (id) => {
         try {
+            setIsSaving((prev) => ({ ...prev, updateSubCat: true }))
             const { data } = await client.post('admin-actions/update-sub-category', {
                 subCategoryId: id,
-                updatedSubCategory,
-                updatedCategory
+                categoryId: updatedCatSubCat.updatedCategoryId,
+                subCategory: updatedCatSubCat.updatedSubCategory,
+                category: updatedCatSubCat.updatedCategory
             })
 
             if (data.status === 1) {
-
+                setUpdatedCatSubCat({
+                    updatedCategory: null,
+                    updatedSubCategory: null,
+                    updatedCategoryId: null
+                })
+                setSuccessToast(data.message)
+                setCategories((prev) =>
+                    prev.map(data => {
+                        if (data.id === updatedCatSubCat.updatedCategoryId) {
+                            return { ...data, categoryName: updatedCatSubCat.updatedCategory }
+                        }
+                        return data
+                    })
+                )
+                setSubCategories((prev) =>
+                    prev.map(data => {
+                        if (data._id === id) {
+                            let updated = { ...data }
+                            if (updatedCatSubCat.updatedCategory) {
+                                updated.categoryName = updatedCatSubCat.updatedCategory
+                                updated.categoryId = updatedCatSubCat.updatedCategoryId
+                            }
+                            if (updatedCatSubCat.updatedSubCategory)
+                                updated.subCategoryName = updatedCatSubCat.updatedSubCategory
+                            return updated
+                        }
+                        return data
+                    })
+                )
+                setEditSubCategory(null)
+                setIsSaving((prev) => ({ ...prev, updateSubCat: false }))
             }
         } catch (error) {
             console.error(error);
+            setIsSaving((prev) => ({ ...prev, updateSubCat: false }))
         }
     }
 
@@ -272,8 +313,11 @@ const SubCategory = () => {
                                 {editSubCategory === sub._id && (
                                     <td>
                                         <input
-                                            value={updatedSubCategory}
-                                            onChange={(e) => setUpdatedSubCategory(e.target.value)}
+                                            value={updatedCatSubCat.updatedSubCategory}
+                                            onChange={(e) =>
+                                                setUpdatedCatSubCat(prev =>
+                                                    ({ ...prev, updatedSubCategory: e.target.value }))
+                                            }
                                             type="text"
                                             placeholder="enter sub category"
                                         />
@@ -289,13 +333,13 @@ const SubCategory = () => {
                                                 <select
                                                     onChange={handleUpdateCategoryChange}
                                                     name="category-option"
-                                                    id="category-select"
+                                                    id="category-select-edit"
                                                 >
                                                     {categories.map((catagory, index) => (
                                                         <option
                                                             key={index}
-                                                            selected={catagory._id === sub.categoryId}
                                                             value={catagory.categoryName}
+                                                            selected={catagory.categoryName === sub.categoryName}
                                                             data-id={catagory._id}
                                                         >
                                                             {catagory.categoryName}
@@ -313,8 +357,12 @@ const SubCategory = () => {
                                     {editSubCategory !== sub._id && (
                                         <button
                                             onClick={() => {
-                                                setUpdatedSubCategory(sub.subCategoryName)
                                                 setEditSubCategory(sub._id)
+                                                setUpdatedCatSubCat({
+                                                    updatedCategory: sub.categoryName,
+                                                    updatedSubCategory: sub.subCategoryName,
+                                                    updatedCategoryId: sub.categoryId
+                                                })
                                             }}
                                             className="category-edit"
                                         >
@@ -324,7 +372,11 @@ const SubCategory = () => {
                                     {editSubCategory === sub._id && (
                                         <button
                                             onClick={() => {
-                                                setUpdatedSubCategory('')
+                                                setUpdatedCatSubCat({
+                                                    updatedCategory: null,
+                                                    updatedSubCategory: null,
+                                                    updatedCategoryId: null,
+                                                })
                                                 setEditSubCategory(null)
                                             }}
                                             className="category-edit-close"
@@ -342,7 +394,7 @@ const SubCategory = () => {
                                     )}
                                     {editSubCategory === sub._id && (
                                         <button
-                                            onClick={handleUpdateSubCatClick}
+                                            onClick={() => handleUpdateSubCatClick(sub._id)}
                                             className="save-edited-changes"
                                         >
                                             <RiSaveLine />

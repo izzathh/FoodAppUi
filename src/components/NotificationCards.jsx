@@ -8,7 +8,8 @@ export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData
     const {
         setSuccessToast,
         setErrorToast,
-        setOrders
+        setOrders,
+        setOrderList
     } = useFoodApp();
 
     const { adminRestaurantId } = useContext(AuthContext);
@@ -29,6 +30,7 @@ export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData
                 setOrders((prev) =>
                     prev.filter(data => data.orderId !== id)
                 )
+                setOrderList((prev) => [...prev, data.updateStatus])
                 confirmed === 'confirmed'
                     ? setSuccessToast('Order placed successfully')
                     : setErrorToast('Order rejected')
@@ -43,7 +45,7 @@ export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData
     }
 
     return (
-        <div className="menu-list-card">
+        <div className="menu-list-card menu-items">
             <div className="card-title">
                 <div className="title-back-btn">
                     <h1>Ordered Items</h1>
@@ -56,39 +58,41 @@ export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData
                 </div>
                 <span>{id}</span>
             </div>
-            {menu.map((data, index) => (
-                <div key={index} className="card-contents">
-                    <div>
-                        <img src={data.image} alt="item image" />
+            <div className="card">
+                {menu.map((data, index) => (
+                    <div key={index} className="card-contents">
+                        <div>
+                            <img src={data.image} alt="item image" />
+                        </div>
+                        <div className="item-name-quantity">
+                            <div>
+                                <label htmlFor="itemName">
+                                    <strong>Item Name: </strong>
+                                </label>
+                                <span id="itemName">{data.itemName}</span>
+                            </div>
+                            <div>
+                                <label htmlFor="quantity">
+                                    <strong>Quantity: </strong>
+                                </label>
+                                <span id="quantity">{data.quantity}</span>
+                            </div>
+                            <div>
+                                <label htmlFor="price">
+                                    <strong>Price: </strong>
+                                </label>
+                                <span id="price">{data.price}</span>
+                            </div>
+                            <div>
+                                <label htmlFor="total">
+                                    <strong>Total: </strong>
+                                </label>
+                                <span id="total">{data.price}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="item-name-quantity">
-                        <div>
-                            <label htmlFor="itemName">
-                                <strong>Item Name: </strong>
-                            </label>
-                            <span id="itemName">{data.itemName}</span>
-                        </div>
-                        <div>
-                            <label htmlFor="quantity">
-                                <strong>Quantity: </strong>
-                            </label>
-                            <span id="quantity">{data.quantity}</span>
-                        </div>
-                        <div>
-                            <label htmlFor="price">
-                                <strong>Price: </strong>
-                            </label>
-                            <span id="price">{data.price}</span>
-                        </div>
-                        <div>
-                            <label htmlFor="total">
-                                <strong>Total: </strong>
-                            </label>
-                            <span id="total">{data.price}</span>
-                        </div>
-                    </div>
-                </div>
-            ))}
+                ))}
+            </div>
             <div className="card-buttons">
                 <button onClick={() => handleStatusChange('confirmed')}>Accept</button>
                 <button onClick={() => handleStatusChange('rejected')}>Reject</button>

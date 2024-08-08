@@ -202,186 +202,188 @@ const AddRestaurant = ({ editPage }) => {
                 setErrors={setErrors}
                 errors={errors}
             />
-            <div className={`add-restaurant-container ${openMenuAddComp || openMenuEditComp ? 'close-add-restaurant-container' : ''}`}>
-                <div className="add-res-title">
-                    <h1>{`${editPage ? 'Edit' : 'Add'} Restaurant`}</h1>
-                </div>
-                <div className="resname-resimg">
-                    <div>
-                        <input
-                            value={restaurantName}
-                            type="text"
-                            name="restaurantName"
-                            placeholder="restaurant name *"
-                            onChange={(e) => {
-                                setRestaurantName(e.target.value)
-                                handleValidation(e)
-                            }}
-                        />
-                        {
-                            errors.restaurantName && <p className="add-res-error1">{errors.restaurantName}</p>
-                        }
+            {!openMenuAddComp && !openMenuEditComp && (
+                <div className={`add-restaurant-container`}>
+                    <div className="add-res-title">
+                        <h1>{`${editPage ? 'Edit' : 'Add'} Restaurant`}</h1>
                     </div>
-                    <div>
-                        <input
-                            value={fullDescription}
-                            type="text"
-                            name="fullDescription"
-                            placeholder="full description *"
-                            onChange={(e) => {
-                                setFullDescription(e.target.value)
-                                handleValidation(e)
-                            }}
-                        />
-                        {
-                            errors.fullDescription && <p className="add-res-error1">{errors.fullDescription}</p>
-                        }
-                    </div>
-                    <div>
-                        <input
-                            value={description}
-                            type="text"
-                            name="description"
-                            placeholder="description *"
-                            onChange={(e) => {
-                                setDescription(e.target.value)
-                                handleValidation(e)
-                            }}
-                        />
-                        {
-                            errors.description && <p className="add-res-error1">{errors.description}</p>
-                        }
-                    </div>
-                    <div
-                        onDrop={handleDrop}
-                        onDragOver={handleDragOver}
-                        className="res-image-uploader"
-                    >
-                        {imagePreview ? (
-                            <>
-                                <button
-                                    onClick={() => {
-                                        setImagePreview(null)
-                                        setImageFile(null)
-                                    }}
-                                >
-                                    <IoCloseCircleOutline />
+                    <div className="resname-resimg">
+                        <div>
+                            <input
+                                value={restaurantName}
+                                type="text"
+                                name="restaurantName"
+                                placeholder="restaurant name *"
+                                onChange={(e) => {
+                                    setRestaurantName(e.target.value)
+                                    handleValidation(e)
+                                }}
+                            />
+                            {
+                                errors.restaurantName && <p className="add-res-error1">{errors.restaurantName}</p>
+                            }
+                        </div>
+                        <div>
+                            <input
+                                value={fullDescription}
+                                type="text"
+                                name="fullDescription"
+                                placeholder="full description *"
+                                onChange={(e) => {
+                                    setFullDescription(e.target.value)
+                                    handleValidation(e)
+                                }}
+                            />
+                            {
+                                errors.fullDescription && <p className="add-res-error1">{errors.fullDescription}</p>
+                            }
+                        </div>
+                        <div>
+                            <input
+                                value={description}
+                                type="text"
+                                name="description"
+                                placeholder="description *"
+                                onChange={(e) => {
+                                    setDescription(e.target.value)
+                                    handleValidation(e)
+                                }}
+                            />
+                            {
+                                errors.description && <p className="add-res-error1">{errors.description}</p>
+                            }
+                        </div>
+                        <div
+                            onDrop={handleDrop}
+                            onDragOver={handleDragOver}
+                            className="res-image-uploader"
+                        >
+                            {imagePreview ? (
+                                <>
+                                    <button
+                                        onClick={() => {
+                                            setImagePreview(null)
+                                            setImageFile(null)
+                                        }}
+                                    >
+                                        <IoCloseCircleOutline />
+                                    </button>
+                                    <img src={imagePreview} className="restaurant-image" alt="image" />
+                                </>
+                            ) : (
+                                <>
+                                    <p>Drag and drop a image or</p>
+                                    <label className="img-upload-btn">
+                                        <input
+                                            className="image-upload"
+                                            type="file"
+                                            name="image"
+                                            accept=".jpg, .jpeg, .png"
+                                            onChange={handleFileChange}
+                                        />
+                                        Browse Files
+                                    </label>
+                                    {
+                                        errors.image && <p className="add-res-error">{errors.image}</p>
+                                    }
+                                </>
+                            )}
+                        </div>
+                        <div className="veg-checkbox">
+                            <label htmlFor="veg">Veg</label>
+                            <input
+                                value={veg}
+                                checked={veg}
+                                type="checkbox"
+                                name="veg"
+                                id="veg"
+                                placeholder="veg"
+                                className="res-veg"
+                                onChange={(e) => {
+                                    setVeg(e.target.checked)
+                                    handleValidation(e)
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <input
+                                value={offer}
+                                type="text"
+                                name="offer"
+                                placeholder="offer"
+                                className="res-offer"
+                                onChange={(e) => {
+                                    setOffer(e.target.value)
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <input
+                                value={address}
+                                type="text"
+                                name="address"
+                                placeholder="address *"
+                                className="res-address"
+                                onChange={(e) => {
+                                    setAddress(e.target.value)
+                                    handleValidation(e)
+                                }}
+                            />
+                            {
+                                errors.address && <p className="add-res-error2">{errors.address}</p>
+                            }
+                        </div>
+                        <div>
+                            <input
+                                value={city}
+                                type="text"
+                                placeholder="city *"
+                                name="city"
+                                className="res-city"
+                                onChange={(e) => {
+                                    setCity(e.target.value)
+                                    handleValidation(e)
+                                }}
+                            />
+                            {
+                                errors.city && <p className="add-res-error3">{errors.city}</p>
+                            }
+                        </div>
+                        {editPage && (
+                            <div className="add-menu">
+                                <button onClick={() => {
+                                    setMenuItemRestaurantId(sessionStorage.getItem('edit-id'))
+                                    setOpenMenuAddComp(true)
+                                }}>
+                                    Add Menu Items
                                 </button>
-                                <img src={imagePreview} className="restaurant-image" alt="image" />
-                            </>
-                        ) : (
-                            <>
-                                <p>Drag and drop a image or</p>
-                                <label className="img-upload-btn">
-                                    <input
-                                        className="image-upload"
-                                        type="file"
-                                        name="image"
-                                        accept=".jpg, .jpeg, .png"
-                                        onChange={handleFileChange}
-                                    />
-                                    Browse Files
-                                </label>
-                                {
-                                    errors.image && <p className="add-res-error">{errors.image}</p>
-                                }
-                            </>
+                                <br />
+                                <br />
+                                <button onClick={() => {
+                                    setMenuItemRestaurantId(sessionStorage.getItem('edit-id'))
+                                    setOpenMenuEditComp(true);
+                                }}>
+                                    Edit Menu Items
+                                </button>
+                            </div>
                         )}
                     </div>
-                    <div className="veg-checkbox">
-                        <label htmlFor="veg">Veg</label>
-                        <input
-                            value={veg}
-                            checked={veg}
-                            type="checkbox"
-                            name="veg"
-                            id="veg"
-                            placeholder="veg"
-                            className="res-veg"
-                            onChange={(e) => {
-                                setVeg(e.target.checked)
-                                handleValidation(e)
-                            }}
-                        />
+                    <div className="add-res-btn">
+                        <button
+                            className="add-restaurant-submit"
+                            onClick={handleSubmit}
+                        >
+                            {`${editPage ? 'Update' : 'Add'} Restaurant`}
+                        </button>
+                        <button
+                            className="cancel-restaurant-submit"
+                            onClick={handleCancelSubmit}
+                        >
+                            Cancel
+                        </button>
                     </div>
-                    <div>
-                        <input
-                            value={offer}
-                            type="text"
-                            name="offer"
-                            placeholder="offer"
-                            className="res-offer"
-                            onChange={(e) => {
-                                setOffer(e.target.value)
-                            }}
-                        />
-                    </div>
-                    <div>
-                        <input
-                            value={address}
-                            type="text"
-                            name="address"
-                            placeholder="address *"
-                            className="res-address"
-                            onChange={(e) => {
-                                setAddress(e.target.value)
-                                handleValidation(e)
-                            }}
-                        />
-                        {
-                            errors.address && <p className="add-res-error2">{errors.address}</p>
-                        }
-                    </div>
-                    <div>
-                        <input
-                            value={city}
-                            type="text"
-                            placeholder="city *"
-                            name="city"
-                            className="res-city"
-                            onChange={(e) => {
-                                setCity(e.target.value)
-                                handleValidation(e)
-                            }}
-                        />
-                        {
-                            errors.city && <p className="add-res-error3">{errors.city}</p>
-                        }
-                    </div>
-                    {editPage && (
-                        <div className="add-menu">
-                            <button onClick={() => {
-                                setMenuItemRestaurantId(sessionStorage.getItem('edit-id'))
-                                setOpenMenuAddComp(true)
-                            }}>
-                                Add Menu Items
-                            </button>
-                            <br />
-                            <br />
-                            <button onClick={() => {
-                                setMenuItemRestaurantId(sessionStorage.getItem('edit-id'))
-                                setOpenMenuEditComp(true);
-                            }}>
-                                Edit Menu Items
-                            </button>
-                        </div>
-                    )}
-                </div>
-                <div className="add-res-btn">
-                    <button
-                        className="add-restaurant-submit"
-                        onClick={handleSubmit}
-                    >
-                        {`${editPage ? 'Update' : 'Add'} Restaurant`}
-                    </button>
-                    <button
-                        className="cancel-restaurant-submit"
-                        onClick={handleCancelSubmit}
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div >
+                </div >
+            )}
         </>
     )
 }

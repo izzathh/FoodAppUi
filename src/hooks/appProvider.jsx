@@ -61,7 +61,12 @@ export const FoodAppProvider = ({ children }) => {
         }
         ws.onmessage = (e) => {
             const message = IsValidJson(e.data) ? JSON.parse(e.data) : e.data;
-            if (message.type === 'newOrder' && adminType === 'shop-admin') {
+            console.log('message:', message);
+            if (
+                message.type === 'newOrder'
+                && adminType === 'shop-admin'
+                && message.data.restaurantId === adminRestaurantId
+            ) {
                 playNotificationSound();
                 setSuccessToast('An Order Received')
                 setAnimateBell(true);
@@ -72,7 +77,11 @@ export const FoodAppProvider = ({ children }) => {
                         order._id === message.data._id ? message.data : order
                     )
                 )
-            } else if (message.type === 'newRestaurant' && adminType === 'admin') {
+            } else if (
+                message.type === 'newRestaurant'
+                && adminType === 'admin'
+                && message.data.restaurantId === adminRestaurantId
+            ) {
                 playNotificationSound();
                 setAnimateBell(true);
                 message.data.registeredAt = getMinAgo(message.data.registeredAt)
@@ -292,6 +301,22 @@ export const FoodAppProvider = ({ children }) => {
         }
     }
 
+
+    const handleAddDishesApi = async (form) => {
+        try {
+            form.append('restaurantId', adminRestaurantId)
+            const { data } = await axios.post(`${baseUrl}/admin-actions/add-menu-items`, form, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            return data
+        } catch (error) {
+            console.error(error);
+            return Error
+        }
+    }
+
     const handleMenuItemEdit = async (values, image, veg) => {
         try {
 
@@ -397,8 +422,8 @@ export const FoodAppProvider = ({ children }) => {
 
     const getAllCategory = async () => {
         try {
-            const { data } = await client
-                .get(`admin-actions/get-all-categories/${adminRestaurantId}`)
+            const { data } = await axios
+                .get(`${baseUrl}/admin-actions/get-all-categories/${adminRestaurantId}`)
             if (data.status === 1 && data.categories.length !== 0) {
                 return data.categories
             }
@@ -410,8 +435,8 @@ export const FoodAppProvider = ({ children }) => {
 
     const getAllSubCategory = async () => {
         try {
-            const { data } = await client
-                .get(`admin-actions/get-all-subcategories/${adminRestaurantId}`)
+            const { data } = await axios
+                .get(`${baseUrl}/admin-actions/get-all-subcategories/${adminRestaurantId}`)
             if (data.status === 1 && data.subcategories.length !== 0) {
                 return data.subcategories
             }
@@ -421,7 +446,20 @@ export const FoodAppProvider = ({ children }) => {
         }
     }
 
-
+    const handleEditDishesApi = async (formData) => {
+        try {
+            formData.append('restaurantId', adminRestaurantId)
+            const { data } = await axios.post(`${baseUrl}/admin-actions/edit-menu-items`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            return data
+        } catch (error) {
+            console.error(error);
+            return Error
+        }
+    }
 
     return (
         <FoodAppContext.Provider
@@ -472,7 +510,10 @@ export const FoodAppProvider = ({ children }) => {
                 subCategories,
                 setSubCategories,
                 getAllCategory,
-                getAllSubCategory
+                getAllSubCategory,
+                handleAddDishesApi,
+                handleEditDishesApi,
+                getBase64
             }}
         >
             {children}
