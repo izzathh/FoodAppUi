@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import { IoFastFoodSharp } from "react-icons/io5";
 import axios from "axios"
 import React, { useContext, useEffect, useState } from "react";
@@ -26,6 +27,16 @@ const Login = () => {
                 password,
                 rememberMe
             })
+            const options = {
+                expires: rememberMe ? 30 : undefined,
+                path: '/',
+                sameSite: 'Lax',
+                secure: false
+            };
+            const token = Cookies.get('auth_token');
+            if (!token) {
+                Cookies.set('auth_token', data.token, options);
+            }
             setSuccessToast('Log in successful')
             sessionStorage.setItem('active', '/')
             window.location.href = data.admin.adminType === 'admin' ? '/' : '/my-restaurant'
