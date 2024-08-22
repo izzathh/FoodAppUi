@@ -276,6 +276,8 @@ export const FoodAppProvider = ({ children }) => {
             formData.append('offer', inputValues.offer || null);
             formData.append('price', inputValues.price);
             formData.append('address', inputValues.address);
+            formData.append('category', inputValues.category);
+            formData.append('subCategory', inputValues.subCategory);
             formData.append('veg', veg);
             formData.append('restaurantId', restaurantId);
             formData.append('image', imageFile1);

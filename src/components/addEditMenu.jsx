@@ -294,6 +294,32 @@ const AddEditMenu = ({
                     {isLoading && <Loader />}
                     <div className="add-edit-menu-fields">
                         <input
+                            id="category"
+                            type="text"
+                            placeholder="category"
+                            name="category"
+                            value={inputValues.category || ''}
+                            onChange={(e) => {
+                                setInputValues(prev => ({ ...prev, category: e.target.value }))
+                            }}
+                        />
+                        {
+                            errors.category && <label htmlFor="category" className="error-label">{errors.category}</label>
+                        }
+                        <input
+                            id="subCategory"
+                            type="text"
+                            placeholder="sub category"
+                            name="subCategory"
+                            value={inputValues.subCategory || ''}
+                            onChange={(e) => {
+                                setInputValues(prev => ({ ...prev, subCategory: e.target.value }))
+                            }}
+                        />
+                        {
+                            errors.subCategory && <label htmlFor="subCategory" className="error-label">{errors.subCategory}</label>
+                        }
+                        <input
                             id="itemName"
                             type="text"
                             placeholder="item name"

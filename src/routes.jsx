@@ -22,8 +22,13 @@ import { PageNotFound } from './pages/404!Authenticated';
 const FoodAppRoutes = () => {
     return (
         <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route element={<ProtectedRoute roles={['admin']} />}>
+            <Route
+                path="/login"
+                element={<LoginPage />}
+            />
+            <Route
+                element={<ProtectedRoute roles={['admin']} />}
+            >
                 <Route
                     path="/dashboard"
                     element={

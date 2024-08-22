@@ -990,7 +990,7 @@ main {
 .add-edit-menu-container {
   flex-direction: column;
   gap: 2em;
-  padding: 1em;
+  padding: 0 1em;
   width: 100%;
   justify-content: center;
   align-items: center;

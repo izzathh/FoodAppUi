@@ -36,7 +36,7 @@ export const RestaurantImgValidation = Yup
 
 export const RegisterRestaurantValidation = Yup.object().shape({
     email: Yup.string().trim().required('email is required'),
-    password: Yup.string().trim().required('password is required'),
+    password: Yup.string().required('password is required'),
     username: Yup.string().trim().required('username is required'),
     restaurantName: Yup.string().trim().required('Restaurant name is required').max(25, 'Restaurant name must be 25 chars at maximum'),
     address: Yup.string().trim().required('Address is required').min(6, 'Address must be 6 chars at minimum'),
