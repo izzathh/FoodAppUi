@@ -27,7 +27,7 @@ const Notifications = () => {
     const [ordersData, setOrdersData] = useState([]);
     const [deliveryJobData, setDeliveryJobData] = useState([]);
     const [restaurantData, setRestaurantData] = useState(null);
-    const [orderId, setOrderId] = useState('');
+    const [orderUniqueId, setOrderUniqueId] = useState('');
     const [adminId, setAdminId] = useState('');
     const [menuItems, setMenuItems] = useState(null);
     const [deliveryJob, setDeliveryJob] = useState(null);
@@ -35,7 +35,7 @@ const Notifications = () => {
 
     const handleClickOutside = (event) => {
         if (divRef.current && !divRef.current.contains(event.target)) {
-            setOrderId('')
+            setOrderUniqueId('')
             setMenuItems(null)
             setOpenNotifications(false);
         }
@@ -112,7 +112,7 @@ const Notifications = () => {
     }, [openNotifications])
 
     const handleOrderClick = (id, menu) => {
-        setOrderId(id)
+        setOrderUniqueId(id)
         setMenuItems(menu)
     }
 
@@ -145,7 +145,7 @@ const Notifications = () => {
             }}
             className={`notifications-container ${loadingNotification ? 'notifications-container-blur' : ''}`}
         >
-            {!orderId && !restaurantData && !deliveryJob && (
+            {!orderUniqueId && !restaurantData && !deliveryJob && (
                 <>
                     <div className="notifications-title">
                         <h1>Notifications</h1>
@@ -181,7 +181,7 @@ const Notifications = () => {
                         {adminType === 'shop-admin' && ordersData.map((data, index) => (
                             <div
                                 key={index}
-                                onClick={() => handleOrderClick(data.orderId, data.menu)}
+                                onClick={() => handleOrderClick(data._id, data.menu)}
                                 className="order-request"
                             >
                                 <div className="notify-image">
@@ -235,11 +235,11 @@ const Notifications = () => {
                     newRestaurants={newRestaurants}
                 />
             )}
-            {orderId && menuItems && (
+            {orderUniqueId && menuItems && (
                 <MenuListCard
-                    id={orderId}
+                    id={orderUniqueId}
                     menu={menuItems}
-                    setOrderId={setOrderId}
+                    setOrderUniqueId={setOrderUniqueId}
                     setMenuItems={setMenuItems}
                     setOrdersData={setOrdersData}
                 />

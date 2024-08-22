@@ -18,7 +18,7 @@ export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData
         try {
             const { data } = await axios.post(`${baseUrl}/admin-actions/update-order-status`,
                 {
-                    orderId: id,
+                    orderUniqueId: id,
                     status: confirmed,
                     restaurantId: adminRestaurantId
                 }
