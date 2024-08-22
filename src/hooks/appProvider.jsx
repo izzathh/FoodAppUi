@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import notificationSound from "../assets/notification.mp3";
 import { AuthContext } from "../context/protectedRoutes";
 import moment from "moment";
+import Cookies from 'js-cookie';
 
 export const FoodAppProvider = ({ children }) => {
     const navigate = useNavigate();
@@ -261,6 +262,7 @@ export const FoodAppProvider = ({ children }) => {
     const adminLogout = async () => {
         try {
             await axios.post(`${baseUrl}/admin-actions/logout`)
+            Cookies.remove('auth_token', { path: '/' });
             window.location.href = '/login'
         } catch (error) {
             console.error('error:', error);
