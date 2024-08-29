@@ -41,7 +41,11 @@ const Login = () => {
             sessionStorage.setItem('active', '/')
             window.location.href = data.admin.adminType === 'admin' ? '/' : '/my-restaurant'
         } catch (error) {
-            setErrorToast(error.response.data.message);
+            console.log(error);
+            if (error.response && error.response.data)
+                setErrorToast(error.response.data.message || error.response.data.error)
+            else
+                setErrorToast('Something Went Wrong')
             console.error(error);
         }
     }

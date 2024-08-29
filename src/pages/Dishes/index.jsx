@@ -49,7 +49,6 @@ const Dishes = () => {
                         label: "Yes",
                         onClick: async () => {
                             const data = await handleMenuDelete(adminRestaurantId, menuId);
-                            console.log('data:', data);
                             if (data) {
                                 setSuccessToast('Menu deleted!')
                                 setDishes((prev) =>

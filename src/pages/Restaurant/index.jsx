@@ -12,14 +12,11 @@ const Restaurant = () => {
         isLoading,
         handleResturantDelete,
         restaurants,
-        setRestaurants,
         closeMenu } = useFoodApp();
 
     useEffect(() => {
         async function getRestaurants() {
-            const allRes = await getAllRestaurants();
-            console.log('allRes:', allRes);
-            setRestaurants(allRes.data.restaurants);
+            await getAllRestaurants();
         }
         getRestaurants();
     }, [])
@@ -54,7 +51,7 @@ const Restaurant = () => {
                         <button>Offers</button>
                     </div>
                     <div className={`all-restaurants ${closeMenu ? 'all-restaurants-close' : ''}`}>
-                        {restaurants.map((shop, index) => (
+                        {restaurants && restaurants.map((shop, index) => (
                             <div onClick={() => handleEditRestaurant(shop._id)} key={index} className="restaurant-contents">
                                 <div className="restaurant-image">
                                     <img src={shop.image} alt="shop" />

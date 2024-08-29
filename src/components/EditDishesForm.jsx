@@ -44,14 +44,14 @@ const EditDishDetails = ({ existingData, setOpenDishEditForm }) => {
             setIsDelivery(existingData.delivery)
             setIsVeg(existingData.veg)
             const existingInputValues = {
-                offer: existingData.offer || null,
+                offer: existingData.offer || "",
                 description: existingData.description,
                 fullDescription: existingData.fullDescription,
                 itemName: existingData.itemName,
                 price: existingData.price
             }
             setInputValues(existingInputValues)
-            formData.set('offer', existingData.offer || null)
+            formData.set('offer', existingData.offer || "")
             formData.set('description', existingData.description)
             formData.set('fullDescription', existingData.fullDescription)
             formData.set('itemName', existingData.itemName)

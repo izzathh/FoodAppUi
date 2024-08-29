@@ -4,7 +4,15 @@ import { useFoodApp } from "../hooks/appProvider";
 import { AuthContext } from "../context/protectedRoutes";
 import { useContext } from "react";
 
-export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData }) => {
+export const MenuListCard = ({
+    id,
+    menu,
+    setMenuItems,
+    setOrderUniqueId,
+    setOrdersData,
+    setOrderId,
+    orderId
+}) => {
     const {
         setSuccessToast,
         setErrorToast,
@@ -36,6 +44,7 @@ export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData
                     : setErrorToast('Order rejected')
                 setMenuItems(null)
                 setOrderId('')
+                setOrderUniqueId('')
                 return
             }
             setErrorToast(data.message)
@@ -52,11 +61,11 @@ export const MenuListCard = ({ id, menu, setMenuItems, setOrderId, setOrdersData
                     <button
                         onClick={() => {
                             setMenuItems(null)
-                            setOrderId('')
+                            setOrderUniqueId('')
                         }}
                     >Back</button>
                 </div>
-                <span>{id}</span>
+                <span>{orderId}</span>
             </div>
             <div className="card">
                 {menu.map((data, index) => (

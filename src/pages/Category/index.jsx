@@ -20,10 +20,11 @@ const Category = () => {
         setSuccessToast,
         categories,
         setCategories,
-        setSubCategories,
         client,
         confirmAlert,
-        getAllCategory
+        getAllCategory,
+        handleDeleteCategory,
+        updateCategory
     } = useFoodApp();
     const { adminId, adminRestaurantId } = useContext(AuthContext);
 
@@ -35,35 +36,7 @@ const Category = () => {
                     throw new Error('This category already exists')
                 }
             })
-            setIsSaving(prev => ({ ...prev, updateCat: true }))
-            const { data } = await client.post('admin-actions/update-category', {
-                categoryId: id,
-                categoryName: updatedCategory
-            })
-            if (data.status === 1) {
-                setIsSaving(prev => ({ ...prev, updateCat: false }))
-                setCategories((prev) =>
-                    prev.map(data => {
-                        if (data._id === id) {
-                            return { ...data, categoryName: updatedCategory };
-                        }
-                        return data
-                    })
-                )
-                setSubCategories((prev) =>
-                    prev.map(data => {
-                        console.log('categoryId:', data.categoryId, id);
-                        if (data.categoryId === id) {
-                            return { ...data, categoryId: id, categoryName: updatedCategory }
-                        }
-                        return data
-                    })
-                )
-                setErrors(prev => ({ ...prev, categoryUpdate: '' }))
-                setOpenCategoryEditor(null);
-                setSuccessToast(data.message)
-                return
-            }
+            await updateCategory(id, updatedCategory, setIsSaving, setErrors, setOpenCategoryEditor)
         } catch (error) {
             console.error(error);
             setIsSaving(prev => ({ ...prev, updateCat: false }))
@@ -80,20 +53,7 @@ const Category = () => {
                     {
                         label: "Yes",
                         onClick: async () => {
-                            setIsSaving(prev => ({ ...prev, deleteCat: true }))
-                            const { data } = await client.delete('admin-actions/delete-category', {
-                                data: {
-                                    categoryId: id,
-                                    restaurantId: adminRestaurantId
-                                }
-                            })
-                            if (data.status === 1) {
-                                setIsSaving(prev => ({ ...prev, deleteCat: false }))
-                                setCategories(prev =>
-                                    prev.filter(data => data._id !== id)
-                                )
-                                setSuccessToast(data.message)
-                            }
+                            handleDeleteCategory(setIsSaving, id)
                         }
                     },
                     {

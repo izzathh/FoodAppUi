@@ -1060,7 +1060,7 @@ main {
   gap: 2em;
   position: relative;
   justify-content: center;
-  width: 30em;
+  width: 40em;
   align-items: center;
 }
 
@@ -1424,6 +1424,7 @@ p.add-res-error5 {
   justify-content: flex-start;
   gap: 2em;
   position: relative;
+  width: 100%;
 }
 
 .category-title-add button {
@@ -1948,7 +1949,6 @@ span.no-notify {
 
 .menu-page-head button {
   font-size: large;
-  position: absolute;
   color: #c03dd4;
   background-color: #ede7f6;
   border: 1px solid #c03dd4;
@@ -2523,4 +2523,32 @@ h1.add-dishes-title {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.resname-resimg .location {
+  position: relative;
+}
+
+.resname-resimg .location #map {
+  margin-top: 5px;
+  box-shadow: 0px 0px 16px #a7a7a7;
+}
+
+.resname-resimg .location button {
+  position: absolute;
+  font-size: 1.5em;
+  height: 50px;
+  background-color: transparent;
+  border: none;
+  transition: color 0.3s ease;
+  color: #333;
+  right: 10px;
+
+  &:hover {
+    color: #0071c4;
+  }
+}
+
+.resname-resimg .location button svg {
+  padding-top: 7px;
 }

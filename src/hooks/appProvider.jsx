@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import axios from "axios"
 const FoodAppContext = createContext();
 const baseUrl = import.meta.env.VITE_BASE_URL
+const webSocUrl = import.meta.env.VITE_WEB_SOCKET_URL
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { useNavigate } from "react-router-dom";
@@ -56,53 +57,61 @@ export const FoodAppProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        const ws = new WebSocket('ws://localhost:8080');
-        ws.onopen = () => {
-            console.log('connected to web socker server');
-        }
-        ws.onmessage = (e) => {
-            const message = IsValidJson(e.data) ? JSON.parse(e.data) : e.data;
-            console.log('message:', message);
-            if (
-                message.type === 'newOrder'
-                && adminType === 'shop-admin'
-                && message.data.restaurantId === adminRestaurantId
-            ) {
-                playNotificationSound();
-                setSuccessToast('An Order Received')
-                setAnimateBell(true);
-                setOrders((prev) => [...prev, message.data])
-            } else if (message.type === 'orderConirmed') {
-                setOrders((prev) =>
-                    prev.map(order =>
-                        order._id === message.data._id ? message.data : order
-                    )
-                )
-            } else if (
-                message.type === 'newRestaurant'
-                && adminType === 'admin'
-                && message.data.restaurantId === adminRestaurantId
-            ) {
-                playNotificationSound();
-                setAnimateBell(true);
-                message.data.registeredAt = getMinAgo(message.data.registeredAt)
-                setNewRestaurants((prev) => [...prev, message.data])
-            } else if (message.type === 'newDeliveryPeople' && adminType === 'admin') {
-                playNotificationSound();
-                setAnimateBell(true);
-                setNewDeliveryPeople((prev) => [...prev, message.application])
+        let ws;
+        const connectWebSocket = () => {
+            ws = new WebSocket(webSocUrl);
+
+            ws.onopen = () => {
+                console.log('connected to web socker server');
             }
+
+            ws.onmessage = (e) => {
+                const message = IsValidJson(e.data) ? JSON.parse(e.data) : e.data;
+                console.log('msg --->', message);
+                if (
+                    message.type === 'newOrder'
+                    && adminType === 'shop-admin'
+                    && message.data.restaurantId === adminRestaurantId
+                ) {
+                    playNotificationSound();
+                    setSuccessToast('An Order Received')
+                    setAnimateBell(true);
+                    setOrders((prev) => [...prev, message.data])
+                } else if (message.type === 'orderConirmed') {
+                    setOrders((prev) =>
+                        prev.map(order =>
+                            order._id === message.data._id ? message.data : order
+                        )
+                    )
+                } else if (
+                    message.type === 'newRestaurant'
+                    && adminType === 'admin'
+                    && message.data.restaurantId === adminRestaurantId
+                ) {
+                    playNotificationSound();
+                    setAnimateBell(true);
+                    message.data.registeredAt = getMinAgo(message.data.registeredAt)
+                    setNewRestaurants((prev) => [...prev, message.data])
+                } else if (message.type === 'newDeliveryPeople' && adminType === 'admin') {
+                    playNotificationSound();
+                    setAnimateBell(true);
+                    setNewDeliveryPeople((prev) => [...prev, message.application])
+                }
+            }
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection closed. Reconnecting...');
+                setTimeout(connectWebSocket, 0)
+            };
         }
 
-        ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
+        setTimeout(connectWebSocket, 0)
 
-        ws.onclose = () => {
-            console.log('WebSocket connection closed');
-        };
-
-        return () => ws.close()
+        return () => { if (ws) ws.close() }
     }, [adminType])
 
     useEffect(() => {
@@ -128,6 +137,7 @@ export const FoodAppProvider = ({ children }) => {
         veg,
         description,
         fullDescription,
+        locationValue,
         id
     ) => {
         try {
@@ -140,6 +150,7 @@ export const FoodAppProvider = ({ children }) => {
             formData.append('veg', veg)
             formData.append('description', description)
             formData.append('fullDescription', fullDescription)
+            formData.append('coordinates', locationValue)
             formData.append('image', image)
 
             const { data } = await axios.post(`${baseUrl}/admin-actions/add-restaurant`, formData, {
@@ -187,6 +198,7 @@ export const FoodAppProvider = ({ children }) => {
         veg,
         description,
         fullDescription,
+        locationValue,
         id
     ) => {
         try {
@@ -199,6 +211,7 @@ export const FoodAppProvider = ({ children }) => {
             formData.append('veg', veg)
             formData.append('description', description)
             formData.append('fullDescription', fullDescription)
+            formData.append('coordinates', locationValue)
             const base64Regex = /^data:image\/(png|jpeg|jpg|gif|bmp|webp);base64,([A-Za-z0-9+/=]+)$/;
             const imageData = !base64Regex.test(image)
                 ? await getBase64(URL.createObjectURL(image))
@@ -222,10 +235,13 @@ export const FoodAppProvider = ({ children }) => {
     }
 
     const getAllRestaurants = async () => {
-        setIsLoading(true);
-        const { data } = await axios.get(`${baseUrl}/admin-actions/get-all-restaurants`);
-        setIsLoading(false);
-        return data;
+        if (restaurants.length === 0) {
+            setIsLoading(true);
+            const { data } = await axios.get(`${baseUrl}/admin-actions/get-all-restaurants`);
+            setRestaurants(data.data.restaurants);
+            setIsLoading(false);
+            return data;
+        }
     }
 
     const getEditRestaurantDetails = async (restaurantId) => {
@@ -275,7 +291,7 @@ export const FoodAppProvider = ({ children }) => {
             formData.append('itemName', inputValues.itemName);
             formData.append('description', inputValues.description);
             formData.append('fullDescription', inputValues.fullDescription);
-            formData.append('offer', inputValues.offer || null);
+            formData.append('offer', inputValues.offer || "");
             formData.append('price', inputValues.price);
             formData.append('address', inputValues.address);
             formData.append('category', inputValues.category);
@@ -305,6 +321,36 @@ export const FoodAppProvider = ({ children }) => {
         }
     }
 
+    const handleDeleteCategory = async (setIsSaving, id) => {
+        try {
+            setIsSaving(prev => ({ ...prev, deleteCat: true }))
+            const { data } = await client.delete('admin-actions/delete-category', {
+                data: {
+                    categoryId: id,
+                    restaurantId: adminRestaurantId
+                }
+            })
+            if (data.status === 1) {
+                setIsSaving(prev => ({ ...prev, deleteCat: false }))
+                setCategories(prev =>
+                    prev.filter(cat => cat._id !== id)
+                )
+                setSubCategories(prev =>
+                    prev.filter(sub => sub.categoryId !== id)
+                )
+                setDishes(prev =>
+                    prev.filter(dish => dish.categoryId !== id)
+                )
+                setSuccessToast(data.message)
+            }
+        } catch (error) {
+            console.error(error);
+            if (error.response && error.response.data)
+                setErrorToast(error.response.data.message || error.response.data.error)
+            else
+                setErrorToast('Something went wrong')
+        }
+    }
 
     const handleAddDishesApi = async (form) => {
         try {
@@ -329,7 +375,7 @@ export const FoodAppProvider = ({ children }) => {
             formData.append("description", values.description)
             formData.append("fullDescription", values.fullDescription)
             formData.append("price", values.price)
-            formData.append("offer", values.offer || null)
+            formData.append("offer", values.offer || "")
             formData.append("menuId", values.menuId)
             formData.append("restaurantId", values.restaurantId)
             formData.append("veg", veg)
@@ -465,6 +511,52 @@ export const FoodAppProvider = ({ children }) => {
         }
     }
 
+    const updateCategory = async (id, updatedCategory, setIsSaving, setErrors, setOpenCategoryEditor) => {
+        try {
+            setIsSaving(prev => ({ ...prev, updateCat: true }))
+            const { data } = await client.post('admin-actions/update-category', {
+                categoryId: id,
+                categoryName: updatedCategory
+            })
+            if (data.status === 1) {
+                setIsSaving(prev => ({ ...prev, updateCat: false }))
+                setCategories((prev) =>
+                    prev.map(data => {
+                        if (data._id === id) {
+                            return { ...data, categoryName: updatedCategory };
+                        }
+                        return data
+                    })
+                )
+                setSubCategories((prev) =>
+                    prev.map(data => {
+                        if (data.categoryId === id) {
+                            return { ...data, categoryId: id, categoryName: updatedCategory }
+                        }
+                        return data
+                    })
+                )
+                setDishes((prev) =>
+                    prev.map(data => {
+                        if (data.categoryId === id) {
+                            return { ...data, categoryId: id, categoryName: updatedCategory }
+                        }
+                        return data
+                    })
+                )
+                setErrors(prev => ({ ...prev, categoryUpdate: '' }))
+                setOpenCategoryEditor(null);
+                setSuccessToast(data.message)
+            }
+        } catch (error) {
+            console.error(error);
+            if (error.response && error.response.data)
+                setErrorToast(error.response.data.message || error.response.data.error)
+            else
+                setErrorToast('Something went wrong')
+        }
+    }
+
     return (
         <FoodAppContext.Provider
             value={{
@@ -517,7 +609,9 @@ export const FoodAppProvider = ({ children }) => {
                 getAllSubCategory,
                 handleAddDishesApi,
                 handleEditDishesApi,
-                getBase64
+                getBase64,
+                handleDeleteCategory,
+                updateCategory
             }}
         >
             {children}

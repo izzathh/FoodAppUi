@@ -20,7 +20,6 @@ const AuthProvider = ({ children }) => {
         const checkAuth = async () => {
             try {
                 const token = Cookies.get('auth_token');
-                console.log('token:', token);
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 await axios.get(`${baseUrl}/admin-actions/check-auth`)
                 setIsAuthenticated(true);

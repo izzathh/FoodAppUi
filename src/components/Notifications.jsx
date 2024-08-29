@@ -28,6 +28,7 @@ const Notifications = () => {
     const [deliveryJobData, setDeliveryJobData] = useState([]);
     const [restaurantData, setRestaurantData] = useState(null);
     const [orderUniqueId, setOrderUniqueId] = useState('');
+    const [orderId, setOrderId] = useState('');
     const [adminId, setAdminId] = useState('');
     const [menuItems, setMenuItems] = useState(null);
     const [deliveryJob, setDeliveryJob] = useState(null);
@@ -102,7 +103,6 @@ const Notifications = () => {
             }
             const getPendingDpRegistration = async () => {
                 const { data } = await axios.get(`${baseUrl}/admin-actions/get-pending-registration`);
-                console.log('registrations:', data.registrations);
                 setNewDeliveryPeople(data.registrations);
             }
             getPendingDpRegistration();
@@ -111,8 +111,9 @@ const Notifications = () => {
         }
     }, [openNotifications])
 
-    const handleOrderClick = (id, menu) => {
+    const handleOrderClick = (id, menu, orderId) => {
         setOrderUniqueId(id)
+        setOrderId(orderId)
         setMenuItems(menu)
     }
 
@@ -181,7 +182,7 @@ const Notifications = () => {
                         {adminType === 'shop-admin' && ordersData.map((data, index) => (
                             <div
                                 key={index}
-                                onClick={() => handleOrderClick(data._id, data.menu)}
+                                onClick={() => handleOrderClick(data._id, data.menu, data.orderId)}
                                 className="order-request"
                             >
                                 <div className="notify-image">
@@ -238,7 +239,9 @@ const Notifications = () => {
             {orderUniqueId && menuItems && (
                 <MenuListCard
                     id={orderUniqueId}
+                    orderId={orderId}
                     menu={menuItems}
+                    setOrderId={setOrderId}
                     setOrderUniqueId={setOrderUniqueId}
                     setMenuItems={setMenuItems}
                     setOrdersData={setOrdersData}

@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { useFoodApp } from "../../hooks/appProvider";
 import { IoCloseCircleOutline } from "react-icons/io5";
-import axios from "axios";
 import { AddRestaurantValidation, RestaurantImgValidation } from "../../schema";
 import * as Yup from "yup"
-import { useNavigate } from "react-router-dom";
 import AddEditMenu from "../../components/addEditMenu";
+import { FaMapLocationDot } from "react-icons/fa6";
+import { Loader } from '@googlemaps/js-api-loader';
 
 const AddRestaurant = ({ editPage }) => {
-    const navigate = useNavigate();
     const [imagePreview, setImagePreview] = useState(null);
     const [imageFile1, setImageFile] = useState(null);
     const {
@@ -16,7 +15,8 @@ const AddRestaurant = ({ editPage }) => {
         handleAddRestaurant,
         handleEditRestaurant,
         getEditRestaurantDetails,
-        confirmAlert
+        confirmAlert,
+        navigate
     } = useFoodApp();
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
@@ -28,8 +28,11 @@ const AddRestaurant = ({ editPage }) => {
     const [openMenuAddComp, setOpenMenuAddComp] = useState(false);
     const [openMenuEditComp, setOpenMenuEditComp] = useState(false);
     const [menuItemRestaurantId, setMenuItemRestaurantId] = useState('');
-
     const [errors, setErrors] = useState({});
+    const [restaurantLocation, setRestaurantLocation] = useState(null);
+    const [locationValue, setLocationValue] = useState('');
+    const [mapIns, setMapIns] = useState(null);
+    const [markerIns, setMarkerIns] = useState(null);
 
     useEffect(() => {
         if (editPage) {
@@ -45,6 +48,7 @@ const AddRestaurant = ({ editPage }) => {
                 setRestaurantName(getEditingResDetails.restaurantData.restaurantName)
                 setImagePreview(getEditingResDetails.restaurantData.image)
                 setImageFile(getEditingResDetails.restaurantData.image)
+                setLocationValue(getEditingResDetails.restaurantData.coordinates)
             }
             getEditRestaurant();
         }
@@ -105,7 +109,8 @@ const AddRestaurant = ({ editPage }) => {
                 city,
                 restaurantName,
                 description,
-                fullDescription
+                fullDescription,
+                location: locationValue
             },
                 { abortEarly: false }
             )
@@ -125,6 +130,7 @@ const AddRestaurant = ({ editPage }) => {
                     veg,
                     description,
                     fullDescription,
+                    locationValue,
                     sessionStorage.getItem('edit-id')
                 )
                 : handleAddRestaurant(
@@ -136,6 +142,7 @@ const AddRestaurant = ({ editPage }) => {
                     veg,
                     description,
                     fullDescription,
+                    locationValue,
                     sessionStorage.getItem('edit-id')
                 ))
 
@@ -159,7 +166,6 @@ const AddRestaurant = ({ editPage }) => {
                     ]
                 });
             }
-
             setAddress('')
             setCity('')
             setRestaurantName('')
@@ -170,6 +176,7 @@ const AddRestaurant = ({ editPage }) => {
             setImagePreview(null)
             setImageFile(null)
             setErrors({})
+            navigate('/')
         } catch (validationErrors) {
             if (validationErrors instanceof Yup.ValidationError) {
                 const formattedErrors = validationErrors.inner.reduce((acc, error) => {
@@ -189,6 +196,90 @@ const AddRestaurant = ({ editPage }) => {
         sessionStorage.setItem('edit-id', null)
         navigate('/')
     }
+
+    const handleMapClick = (event) => {
+        const latLng = {
+            lat: event.latLng.lat(),
+            lng: event.latLng.lng(),
+        };
+        setErrors((pre) => ({ ...pre, location: '' }))
+        const locationVal = latLng.lat + ',' + latLng.lng
+        setLocationValue(locationVal)
+        setRestaurantLocation(latLng);
+    };
+
+    useEffect(() => {
+        async function initMap() {
+            try {
+                const loader = new Loader({
+                    apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+                    version: "weekly",
+                    libraries: ["places"],
+                });
+                loader.load().then(async (google) => {
+                    const { Map } = await google.maps.importLibrary("maps");
+                    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker")
+
+                    const currentZoom = mapIns ? mapIns.getZoom() : 15;
+
+                    const mapOptions = {
+                        zoom: currentZoom,
+                        center: restaurantLocation || { lat: 0, lng: 0 },
+                        mapId: 'restaurant'
+                    };
+                    let map
+                    if (!mapIns) {
+                        map = new Map(document.getElementById("map"), mapOptions)
+                        map.addListener('click', handleMapClick)
+                        setMapIns(map)
+                    } else {
+                        map = mapIns;
+                        map.setCenter(restaurantLocation || { lat: 0, lng: 0 });
+                    }
+
+                    if (markerIns) {
+                        markerIns.setMap(null);
+                    }
+
+                    const marker = new AdvancedMarkerElement({
+                        map: map,
+                        position: restaurantLocation || { lat: 0, lng: 0 },
+                    })
+                    setMarkerIns(marker)
+                })
+            } catch (e) {
+                console.error("Error loading Google Maps API:", e);
+            }
+        }
+        initMap()
+    }, [restaurantLocation]);
+
+    const getCurrentLocation = (e) => {
+        e.stopPropagation()
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const latLng = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    const locationVal = latLng.lat + ',' + latLng.lng
+                    setErrors((pre) => ({ ...pre, location: '' }))
+                    setLocationValue(locationVal)
+                    setRestaurantLocation(latLng);
+                },
+                (error) => {
+                    console.error('Error getting location:', error);
+                }
+            );
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+        }
+    };
+
+    useEffect(() => {
+        console.log('restaurantLocation:', restaurantLocation);
+    }, [restaurantLocation])
 
     return (
         <>
@@ -210,10 +301,11 @@ const AddRestaurant = ({ editPage }) => {
                     <div className="resname-resimg">
                         <div>
                             <input
+                                disabled={editPage && !restaurantName}
                                 value={restaurantName}
                                 type="text"
                                 name="restaurantName"
-                                placeholder="restaurant name *"
+                                placeholder='restaurant name *'
                                 onChange={(e) => {
                                     setRestaurantName(e.target.value)
                                     handleValidation(e)
@@ -225,6 +317,7 @@ const AddRestaurant = ({ editPage }) => {
                         </div>
                         <div>
                             <input
+                                disabled={editPage && !fullDescription}
                                 value={fullDescription}
                                 type="text"
                                 name="fullDescription"
@@ -240,6 +333,7 @@ const AddRestaurant = ({ editPage }) => {
                         </div>
                         <div>
                             <input
+                                disabled={editPage && !description}
                                 value={description}
                                 type="text"
                                 name="description"
@@ -289,6 +383,36 @@ const AddRestaurant = ({ editPage }) => {
                                 </>
                             )}
                         </div>
+                        <div className="location">
+                            <input
+                                disabled={editPage && !description}
+                                type="text"
+                                name="location"
+                                id="location"
+                                placeholder="Enter restaurant coordinates"
+                                value={locationValue}
+                                onChange={(e) => {
+                                    setLocationValue(e.target.value)
+                                    handleValidation(e)
+                                }}
+                                onClick={() => {
+                                    setRestaurantLocation(null)
+                                    setMapIns(null)
+                                }}
+                            />
+                            <button
+                                title="Get my current location"
+                                onClick={getCurrentLocation}
+                            >
+                                <FaMapLocationDot />
+                            </button>
+                            {restaurantLocation && (
+                                <div id="map" style={{ width: '100%', height: '400px' }}></div>
+                            )}
+                            {
+                                errors.location && <p className="add-res-error2">{errors.location}</p>
+                            }
+                        </div>
                         <div className="veg-checkbox">
                             <label htmlFor="veg">Veg</label>
                             <input
@@ -319,6 +443,7 @@ const AddRestaurant = ({ editPage }) => {
                         </div>
                         <div>
                             <input
+                                disabled={editPage && !address}
                                 value={address}
                                 type="text"
                                 name="address"
@@ -335,6 +460,7 @@ const AddRestaurant = ({ editPage }) => {
                         </div>
                         <div>
                             <input
+                                disabled={editPage && !city}
                                 value={city}
                                 type="text"
                                 placeholder="city *"

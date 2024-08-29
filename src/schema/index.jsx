@@ -6,6 +6,7 @@ export const AddRestaurantValidation = Yup.object().shape({
     city: Yup.string().trim().required('City is required'),
     description: Yup.string().trim().max(25, 'description must be 25 chars at maximum').required('description is required'),
     fullDescription: Yup.string().trim().required('full description is required'),
+    location: Yup.string().trim().required('Restaurant location is required'),
 })
 
 export const EditRestaurantValidation = Yup.object().shape({

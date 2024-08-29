@@ -22,7 +22,7 @@ const AddEditMenu = ({
     const [imagePreview, setImagePreview] = useState(null)
     const [imageFile1, setImageFile] = useState(null)
     const [veg, setVeg] = useState(false)
-    const [inputValues, setInputValues] = useState({ offer: null })
+    const [inputValues, setInputValues] = useState({ offer: "" })
 
     const [editImagePreview, setEditImagePreview] = useState(null)
     const [editImageFile1, setEditImageFile] = useState(null)
