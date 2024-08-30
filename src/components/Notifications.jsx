@@ -13,15 +13,16 @@ const Notifications = () => {
         setOpenNotifications,
         openNotifications,
         orders,
-        setOrders,
         newRestaurants,
         setNewRestaurants,
         newDeliveryPeople,
         setNewDeliveryPeople,
-        getMinAgo
+        getMinAgo,
+        loadingNotification,
+        setLoadingNotification
     } = useFoodApp();
 
-    const { adminType, adminRestaurantId } = useContext(AuthContext);
+    const { adminType } = useContext(AuthContext);
 
     const divRef = useRef(null);
     const [ordersData, setOrdersData] = useState([]);
@@ -32,7 +33,6 @@ const Notifications = () => {
     const [adminId, setAdminId] = useState('');
     const [menuItems, setMenuItems] = useState(null);
     const [deliveryJob, setDeliveryJob] = useState(null);
-    const [loadingNotification, setLoadingNotification] = useState(false);
 
     const handleClickOutside = (event) => {
         if (divRef.current && !divRef.current.contains(event.target)) {
@@ -52,17 +52,10 @@ const Notifications = () => {
 
     useEffect(() => {
         orders.map(item => {
-            if (
-                !item.orderedAt.includes('min') &&
-                !item.orderedAt.includes('hour') &&
-                !item.orderedAt.includes('just') &&
-                !item.orderedAt.includes('day')
-            ) {
-                item.orderedAt = getMinAgo(item.orderedAt)
-            }
+            item.orderedTime = getMinAgo(item.orderedAt)
         })
         setOrdersData(orders)
-    }, [orders])
+    }, [orders, openNotifications])
 
     useEffect(() => {
         newDeliveryPeople?.map(people => {
@@ -77,39 +70,6 @@ const Notifications = () => {
         })
         setDeliveryJobData(newDeliveryPeople)
     }, [newDeliveryPeople])
-
-    useEffect(() => {
-        if (openNotifications && adminType === 'shop-admin' && orders.length === 0) {
-            setLoadingNotification(true);
-            const getPendingOrders = async () => {
-                const { data } = await axios.get(`${baseUrl}/admin-actions/get-pending-orders?id=${adminRestaurantId}`);
-                console.log('data:', data.orders);
-                setOrders(data.orders);
-            }
-            getPendingOrders();
-            setLoadingNotification(false);
-            console.log('orders:', orders);
-        } else if (openNotifications && adminType === 'admin' && newRestaurants.length === 0) {
-            setLoadingNotification(true);
-            const getRestaurantRequests = async () => {
-                const { data } = await axios
-                    .get(`${baseUrl}/admin-actions/get-restaurant-requests?admin=1&restaurantId=none`);
-                if (data.status === 1) {
-                    data.restaurants?.map(rest => {
-                        rest.registeredAt = getMinAgo(rest.registeredAt)
-                    })
-                    setNewRestaurants(data.restaurants);
-                }
-            }
-            const getPendingDpRegistration = async () => {
-                const { data } = await axios.get(`${baseUrl}/admin-actions/get-pending-registration`);
-                setNewDeliveryPeople(data.registrations);
-            }
-            getPendingDpRegistration();
-            getRestaurantRequests();
-            setLoadingNotification(false);
-        }
-    }, [openNotifications])
 
     const handleOrderClick = (id, menu, orderId) => {
         setOrderUniqueId(id)
@@ -130,10 +90,6 @@ const Notifications = () => {
         } catch (error) {
             console.log('handleNewResClick:', error);
         }
-    }
-
-    const handleDeliveryJobClick = async (data) => {
-
     }
 
 
@@ -189,9 +145,9 @@ const Notifications = () => {
                                     <IoRestaurantOutline />
                                 </div>
                                 <div className="message-contents">
-                                    <h4>{`${data.menucount} Items were Ordered`}</h4>
+                                    <h4>{`${data.menucount} Item were Ordered`}</h4>
                                     <div className="notify-time-process">
-                                        <p>{data.orderedAt}</p>•
+                                        <p>{data.orderedTime}</p>•
                                         <span>Order</span>
                                     </div>
                                 </div>

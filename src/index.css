@@ -1420,7 +1420,7 @@ p.add-res-error5 {
 
 .category-title-add {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: flex-start;
   gap: 2em;
   position: relative;
@@ -1428,18 +1428,22 @@ p.add-res-error5 {
 }
 
 .category-title-add button {
-  font-size: xx-large;
+  font-size: x-large;
   background-color: #e3f2fd;
   color: #0071c4;
   border: none;
   border-top: 2px solid #0071c4;
-  border-radius: 1em;
-  width: 4em;
+  border-left: 2px solid #a1cceb;
+  border-right: 2px solid #a1cceb;
+  border-bottom: 2px solid #0071c4;
+  border-radius: 5px;
+  width: 3em;
   transform: translateY(0px);
   transition: all 0.3s ease;
 
   &:hover {
     border-top: 2px solid #e3f2fd;
+    border-bottom: 4px solid #0071c4;
     transform: translateY(-2px);
   }
 }
@@ -1783,6 +1787,11 @@ span.no-notify {
   padding: 10px;
   border-radius: 10px;
   gap: 1em;
+  transition: transform 0.5s ease;
+
+  &:hover {
+    transform: scale(0.9);
+  }
 }
 
 .notification-contents>div:nth-child(even) {
@@ -2245,21 +2254,26 @@ label.error-label {
 }
 
 .admin-restaurant-container h1 {
-  text-align: center;
+  text-align: start;
   margin-top: 0;
 }
 
 .restaurant-page-image {
-  width: 50%;
+  width: 70%;
+  background-color: rgb(240, 220, 220);
+  height: 27em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.5s ease;
+  border-radius: 1em;
 }
 
 .restaurant-page-image img {
-  width: 100%;
+  width: auto;
   height: 25em;
-  border-radius: 1em;
+  border-radius: .125rem;
   object-fit: contain;
-  background-color: rgb(240, 220, 220);
-  transition: background-color 0.5s ease;
 }
 
 .restaurant-data {
@@ -2281,8 +2295,8 @@ label.error-label {
   gap: 1.5em;
 }
 
-.restaurant-details label {
-  font-weight: 700;
+.restaurant-details h3 {
+  margin: 5px 0;
 }
 
 .resta-full-description {
@@ -2306,7 +2320,7 @@ label.error-label {
   border: 2px dashed #27c400;
 }
 
-.delivery-on-img img {
+.restaurant-page-image.delivery-on-img {
   background-color: #e2f2dd;
 }
 

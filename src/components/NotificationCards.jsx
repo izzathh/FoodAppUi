@@ -33,12 +33,12 @@ export const MenuListCard = ({
             )
             if (data.status === 1) {
                 setOrdersData((prev) =>
-                    prev.filter(data => data.orderId !== id)
+                    prev.filter(data => data._id !== id)
                 )
                 setOrders((prev) =>
-                    prev.filter(data => data.orderId !== id)
+                    prev.filter(data => data._id !== id)
                 )
-                setOrderList((prev) => [...prev, data.updateStatus])
+                setOrderList((prev) => [data.updateStatus, ...prev])
                 confirmed === 'confirmed'
                     ? setSuccessToast('Order placed successfully')
                     : setErrorToast('Order rejected')

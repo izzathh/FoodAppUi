@@ -1,3 +1,4 @@
+import { FaRegEdit } from "react-icons/fa";
 import { useState } from "react";
 
 const AdminRestaurant = () => {
@@ -5,37 +6,36 @@ const AdminRestaurant = () => {
 
     return (
         <div className="admin-restaurant-container">
-            <div>
+            <div className="header category-title-add">
                 <h1>Restaurant</h1>
+                <button
+                >
+                    <FaRegEdit />
+                </button>
             </div>
             <div className="restaurant-data">
                 <div className="resta-image-details">
                     <div className={`restaurant-page-image ${delivery ? 'delivery-on-img' : ''}`}>
                         <img
-                            src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_660/2b4f62d606d1b2bfba9ba9e5386fabb7"
+                            src="https://corporate.mcdonalds.com/content/dam/sites/corp/nfl/newsroom/Grimace%20Meal%20and%20Shake-sized.png"
                             alt="Restaurant Image"
                         />
                     </div>
                     <div className="restaurant-details">
                         <div>
-                            <label htmlFor="name">Name: </label>
-                            <span id="name">Domino's Pizza</span>
+                            <h3><strong id="name">McDonald's</strong></h3>
                         </div>
                         <div>
-                            <label htmlFor="name">Veg: </label>
-                            <span id="name">No</span>
+                            <span id="name">National pizza restaurant</span>
                         </div>
                         <div>
-                            <label htmlFor="name">Offer: </label>
+                            <span id="name">Non-veg</span>
+                        </div>
+                        <div>
                             <span id="name">No offers were added</span>
                         </div>
                         <div>
-                            <label htmlFor="name">Address: </label>
                             <span id="name">307, Anna nagar, Madurai - 09</span>
-                        </div>
-                        <div>
-                            <label htmlFor="name">Description: </label>
-                            <span id="name">National pizza restaurant</span>
                         </div>
                         <div className={`delivery-on-off ${delivery ? 'delivery-on' : ''}`}>
                             <label htmlFor="switch3">Delivery</label>

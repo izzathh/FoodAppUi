@@ -30,6 +30,7 @@ export const FoodAppProvider = ({ children }) => {
     const [dishes, setDishes] = useState([]);
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
+    const [loadingNotification, setLoadingNotification] = useState(false);
 
     const { adminType, adminId, adminRestaurantId } = useContext(AuthContext);
 
@@ -48,12 +49,19 @@ export const FoodAppProvider = ({ children }) => {
         const currentTime = moment();
         const diff = currentTime.diff(orderTime)
         const timeDur = moment.duration(diff)
-        const checkDur = timeDur.days() != 0
-            ? `${timeDur.days()} day${timeDur.days() > 1 ? 's' : ''} ago`
-            : timeDur.hours() != 0
-                ? `${timeDur.hours()} hour${timeDur.hours() > 1 ? 's' : ''} ago`
-                : timeDur.minutes() == 0 ? 'just now' : `${timeDur.minutes()} min${timeDur.minutes() > 1 ? 's' : ''} ago`
-        return checkDur;
+
+        if (timeDur.days() !== 0)
+            return `${timeDur.days()} day${timeDur.days() > 1 ? 's' : ''} ago`
+
+        if (timeDur.hours() !== 0) {
+            return `${timeDur.hours()} hour${timeDur.hours() > 1 ? 's' : ''} ago`;
+        }
+
+        if (timeDur.minutes() !== 0) {
+            return `${timeDur.minutes()} min${timeDur.minutes() > 1 ? 's' : ''} ago`;
+        }
+
+        return 'just now'
     }
 
     useEffect(() => {
@@ -76,7 +84,7 @@ export const FoodAppProvider = ({ children }) => {
                     playNotificationSound();
                     setSuccessToast('An Order Received')
                     setAnimateBell(true);
-                    setOrders((prev) => [...prev, message.data])
+                    setOrders((prev) => [message.data, ...prev])
                 } else if (message.type === 'orderConirmed') {
                     setOrders((prev) =>
                         prev.map(order =>
@@ -91,11 +99,11 @@ export const FoodAppProvider = ({ children }) => {
                     playNotificationSound();
                     setAnimateBell(true);
                     message.data.registeredAt = getMinAgo(message.data.registeredAt)
-                    setNewRestaurants((prev) => [...prev, message.data])
+                    setNewRestaurants((prev) => [message.data, ...prev])
                 } else if (message.type === 'newDeliveryPeople' && adminType === 'admin') {
                     playNotificationSound();
                     setAnimateBell(true);
-                    setNewDeliveryPeople((prev) => [...prev, message.application])
+                    setNewDeliveryPeople((prev) => [message.application, ...prev])
                 }
             }
 
@@ -127,6 +135,38 @@ export const FoodAppProvider = ({ children }) => {
             setSuccessToast('')
         }
     }, [successToast])
+
+    useEffect(() => {
+        if (adminType === 'shop-admin' && orders.length === 0) {
+            setLoadingNotification(true);
+            const getPendingOrders = async () => {
+                const { data } = await axios.get(`${baseUrl}/admin-actions/get-pending-orders?id=${adminRestaurantId}`);
+                console.log('data:', data.orders);
+                setOrders(data.orders);
+            }
+            getPendingOrders();
+            setLoadingNotification(false);
+        } else if (adminType === 'admin' && newRestaurants.length === 0) {
+            setLoadingNotification(true);
+            const getRestaurantRequests = async () => {
+                const { data } = await axios
+                    .get(`${baseUrl}/admin-actions/get-restaurant-requests?admin=1&restaurantId=none`);
+                if (data.status === 1) {
+                    data.restaurants?.map(rest => {
+                        rest.registeredAt = getMinAgo(rest.registeredAt)
+                    })
+                    setNewRestaurants(data.restaurants);
+                }
+            }
+            const getPendingDpRegistration = async () => {
+                const { data } = await axios.get(`${baseUrl}/admin-actions/get-pending-registration`);
+                setNewDeliveryPeople(data.registrations);
+            }
+            getPendingDpRegistration();
+            getRestaurantRequests();
+            setLoadingNotification(false);
+        }
+    }, [adminType, orders])
 
     const handleAddRestaurant = async (
         address,
@@ -611,7 +651,9 @@ export const FoodAppProvider = ({ children }) => {
                 handleEditDishesApi,
                 getBase64,
                 handleDeleteCategory,
-                updateCategory
+                updateCategory,
+                loadingNotification,
+                setLoadingNotification
             }}
         >
             {children}
