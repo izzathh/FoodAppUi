@@ -4,21 +4,21 @@ export const AddRestaurantValidation = Yup.object().shape({
     restaurantName: Yup.string().trim().required('Restaurant name is required').max(25, 'Restaurant name must be 25 chars at maximum'),
     address: Yup.string().trim().required('Address is required').min(6, 'Address must be 6 chars at minimum'),
     city: Yup.string().trim().required('City is required'),
-    description: Yup.string().trim().max(25, 'description must be 25 chars at maximum').required('description is required'),
+    description: Yup.string().trim().max(30, 'description must be 30 chars at maximum').required('description is required'),
     fullDescription: Yup.string().trim().required('full description is required'),
     location: Yup.string().trim().required('Restaurant location is required'),
 })
 
 export const EditRestaurantValidation = Yup.object().shape({
     address: Yup.string().trim().required('Address is required').min(6, 'Address must be 6 chars at minimum'),
-    description: Yup.string().trim().max(25, 'description must be 25 chars at maximum').required('description is required'),
+    description: Yup.string().trim().max(30, 'description must be 30 chars at maximum').required('description is required'),
     fullDescription: Yup.string().trim().required('full description is required'),
     itemName: Yup.string().trim().required('Item name is required'),
     price: Yup.string().trim().required('Price is required')
 })
 
 export const EditMenuValidation = Yup.object().shape({
-    description: Yup.string().trim().max(25, 'description must be 25 chars at maximum').required('description is required'),
+    description: Yup.string().trim().max(30, 'description must be 30 chars at maximum').required('description is required'),
     fullDescription: Yup.string().trim().required('full description is required'),
     itemName: Yup.string().trim().required('Item name is required'),
     price: Yup.string().trim().required('Price is required')
@@ -33,6 +33,14 @@ export const RestaurantImgValidation = Yup
         }
         return true;
     })
+    .test(
+        'fileSize',
+        'File size exceeds the limit of 2MB.',
+        (value) => {
+            if (typeof value === 'string') return true;
+            if (!value) return true;
+            return value.size <= 2 * 1024 * 1024;
+        })
 
 
 export const RegisterRestaurantValidation = Yup.object().shape({
@@ -42,8 +50,9 @@ export const RegisterRestaurantValidation = Yup.object().shape({
     restaurantName: Yup.string().trim().required('Restaurant name is required').max(25, 'Restaurant name must be 25 chars at maximum'),
     address: Yup.string().trim().required('Address is required').min(6, 'Address must be 6 chars at minimum'),
     city: Yup.string().trim().required('City is required'),
-    description: Yup.string().trim().max(25, 'description must be 25 chars at maximum').required('description is required'),
+    description: Yup.string().trim().max(30, 'description must be 30 chars at maximum').required('description is required'),
     fullDescription: Yup.string().trim().required('full description is required'),
+    location: Yup.string().trim().required('Restaurant location is required'),
 })
 
 export const newCategoryValidation = Yup.object().shape({

@@ -32,16 +32,18 @@ export const MenuListCard = ({
                 }
             )
             if (data.status === 1) {
-                setOrdersData((prev) =>
-                    prev.filter(data => data._id !== id)
-                )
+                if (confirmed === 'confirmed') {
+                    setOrderList((prev) => [data.updateStatus, ...prev])
+                    setSuccessToast('Order placed successfully')
+                } else {
+                    setErrorToast('Order rejected')
+                }
                 setOrders((prev) =>
                     prev.filter(data => data._id !== id)
                 )
-                setOrderList((prev) => [data.updateStatus, ...prev])
-                confirmed === 'confirmed'
-                    ? setSuccessToast('Order placed successfully')
-                    : setErrorToast('Order rejected')
+                setOrdersData((prev) =>
+                    prev.filter(data => data._id !== id)
+                )
                 setMenuItems(null)
                 setOrderId('')
                 setOrderUniqueId('')

@@ -141,8 +141,7 @@ export const FoodAppProvider = ({ children }) => {
             setLoadingNotification(true);
             const getPendingOrders = async () => {
                 const { data } = await axios.get(`${baseUrl}/admin-actions/get-pending-orders?id=${adminRestaurantId}`);
-                console.log('data:', data.orders);
-                setOrders(data.orders);
+                if (data.orders.length !== 0) setOrders(data.orders);
             }
             getPendingOrders();
             setLoadingNotification(false);
@@ -151,7 +150,7 @@ export const FoodAppProvider = ({ children }) => {
             const getRestaurantRequests = async () => {
                 const { data } = await axios
                     .get(`${baseUrl}/admin-actions/get-restaurant-requests?admin=1&restaurantId=none`);
-                if (data.status === 1) {
+                if (data.status === 1 && data.restaurants.length !== 0) {
                     data.restaurants?.map(rest => {
                         rest.registeredAt = getMinAgo(rest.registeredAt)
                     })
@@ -467,7 +466,8 @@ export const FoodAppProvider = ({ children }) => {
         offer,
         veg,
         description,
-        fullDescription
+        fullDescription,
+        location
     ) => {
         try {
 
@@ -482,8 +482,9 @@ export const FoodAppProvider = ({ children }) => {
             formData.append("fullDescription", fullDescription)
             formData.append("offer", offer || null)
             formData.append("veg", veg)
-            const getBase = await getBase64(URL.createObjectURL(image))
-            formData.append("image", getBase)
+            // const getBase = await getBase64(URL.createObjectURL(image))
+            formData.append("coordinates", location)
+            formData.append("image", image)
 
             const { data } = await axios.post(`${baseUrl}/admin-actions/register-restaurant`, formData,
                 {

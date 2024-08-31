@@ -61,7 +61,7 @@ const Navbar = () => {
                         onMouseEnter={() => setAnimateBell(true)}
                         onMouseLeave={() => setAnimateBell(false)}
                     >
-                        <span></span>
+                        {/* <span></span> */}
                         <IoMdNotificationsOutline
                             className={`${animateBell ? 'animate-notification-svg' : ''}`}
                         />

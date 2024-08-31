@@ -4,6 +4,8 @@ import { IoCloseCircleOutline } from "react-icons/io5";
 import { RegisterRestaurantValidation, RestaurantImgValidation } from "../../schema";
 import * as Yup from "yup"
 import { IoFastFoodSharp } from "react-icons/io5";
+import { FaMapLocationDot } from "react-icons/fa6";
+import { Loader } from '@googlemaps/js-api-loader';
 
 const ResgisterRestaurant = () => {
     const [restaurantInputs, setRestaurantInputs] = useState({ offer: null });
@@ -11,6 +13,11 @@ const ResgisterRestaurant = () => {
     const [errors, setErrors] = useState({});
     const [imagePreview, setImagePreview] = useState(null);
     const [imageFile, setImageFile] = useState(null);
+    const [restaurantLocation, setRestaurantLocation] = useState(null);
+    const [locationValue, setLocationValue] = useState('');
+    const [mapIns, setMapIns] = useState(null);
+    const [markerIns, setMarkerIns] = useState(null);
+
     const {
         setErrorToast,
         handleRegisterRestaurant
@@ -69,7 +76,8 @@ const ResgisterRestaurant = () => {
                 city: restaurantInputs.city,
                 restaurantName: restaurantInputs.restaurantName,
                 description: restaurantInputs.description,
-                fullDescription: restaurantInputs.fullDescription
+                fullDescription: restaurantInputs.fullDescription,
+                location: locationValue
             },
                 { abortEarly: false }
             )
@@ -91,6 +99,7 @@ const ResgisterRestaurant = () => {
                 veg,
                 restaurantInputs.description,
                 restaurantInputs.fullDescription,
+                locationValue
             )
 
             if (response) {
@@ -99,6 +108,8 @@ const ResgisterRestaurant = () => {
                 setImagePreview(null)
                 setImageFile(null)
                 setErrors({})
+                setLocationValue('')
+                setRestaurantLocation(null)
             }
 
         } catch (validationErrors) {
@@ -115,6 +126,86 @@ const ResgisterRestaurant = () => {
             }
         }
     }
+
+    const handleMapClick = (event) => {
+        const latLng = {
+            lat: event.latLng.lat(),
+            lng: event.latLng.lng(),
+        };
+        setErrors((pre) => ({ ...pre, location: '' }))
+        const locationVal = latLng.lat + ',' + latLng.lng
+        setLocationValue(locationVal)
+        setRestaurantLocation(latLng);
+    };
+
+    useEffect(() => {
+        async function initMap() {
+            try {
+                const loader = new Loader({
+                    apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+                    version: "weekly",
+                    libraries: ["places"],
+                });
+                loader.load().then(async (google) => {
+                    const { Map } = await google.maps.importLibrary("maps");
+                    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker")
+
+                    const currentZoom = mapIns ? mapIns.getZoom() : 15;
+
+                    const mapOptions = {
+                        zoom: currentZoom,
+                        center: restaurantLocation || { lat: 0, lng: 0 },
+                        mapId: 'restaurant'
+                    };
+                    let map
+                    if (!mapIns) {
+                        map = new Map(document.getElementById("map"), mapOptions)
+                        map.addListener('click', handleMapClick)
+                        setMapIns(map)
+                    } else {
+                        map = mapIns;
+                        map.setCenter(restaurantLocation || { lat: 0, lng: 0 });
+                    }
+
+                    if (markerIns) {
+                        markerIns.setMap(null);
+                    }
+
+                    const marker = new AdvancedMarkerElement({
+                        map: map,
+                        position: restaurantLocation || { lat: 0, lng: 0 },
+                    })
+                    setMarkerIns(marker)
+                })
+            } catch (e) {
+                console.error("Error loading Google Maps API:", e);
+            }
+        }
+        initMap()
+    }, [restaurantLocation]);
+
+    const getCurrentLocation = (e) => {
+        e.stopPropagation()
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const latLng = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    const locationVal = latLng.lat + ',' + latLng.lng
+                    setErrors((pre) => ({ ...pre, location: '' }))
+                    setLocationValue(locationVal)
+                    setRestaurantLocation(latLng);
+                },
+                (error) => {
+                    console.error('Error getting location:', error);
+                }
+            );
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+        }
+    };
 
     return (
         <div className="registration-container">
@@ -272,6 +363,35 @@ const ResgisterRestaurant = () => {
                                 }
                             </>
                         )}
+                    </div>
+                    <div className="location">
+                        <input
+                            type="text"
+                            name="location"
+                            id="location"
+                            placeholder="Enter restaurant coordinates"
+                            value={locationValue}
+                            onChange={(e) => {
+                                setLocationValue(e.target.value)
+                                handleValidation(e)
+                            }}
+                            onClick={() => {
+                                setRestaurantLocation(null)
+                                setMapIns(null)
+                            }}
+                        />
+                        <button
+                            title="Get my current location"
+                            onClick={getCurrentLocation}
+                        >
+                            <FaMapLocationDot />
+                        </button>
+                        {restaurantLocation && (
+                            <div id="map" style={{ width: '100%', height: '400px' }}></div>
+                        )}
+                        {
+                            errors.location && <p className="add-res-error2">{errors.location}</p>
+                        }
                     </div>
                     <div className="vegoffer-addresscity-cont">
                         <div className="veg-offer">
